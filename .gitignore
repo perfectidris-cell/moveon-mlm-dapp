@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Environment variables - NEVER COMMIT THESE
+.env
+.env.local
+.env.*.local
+*.env
+
+# Build outputs
+dist/
+build/
+frontend/dist/
+
+# Hardhat artifacts
+backend/cache/
+backend/artifacts/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Misc
+*.swp
+*.swo
+.gemini/
+brain/
