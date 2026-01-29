@@ -5,6 +5,9 @@ import Navbar from '../components/Navbar';
 import { motion } from 'framer-motion';
 import { Zap, Trees, ShieldCheck, ArrowRight, Wallet, UserPlus, CheckCircle2, Gem } from 'lucide-react';
 
+import Disclaimer from '../components/Disclaimer';
+import TermsModal from '../components/TermsModal';
+
 const HomePage: React.FC = () => {
     const { account, contract, connectWallet, isConnecting, chainId } = useWeb3();
     const [referrerAddress, setReferrerAddress] = useState('');
@@ -14,6 +17,8 @@ const HomePage: React.FC = () => {
     const [registrationSuccess, setRegistrationSuccess] = useState(false);
     const [isValidatingReferrer, setIsValidatingReferrer] = useState(false);
     const [referrerValid, setReferrerValid] = useState<boolean | null>(null);
+    const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -82,6 +87,11 @@ const HomePage: React.FC = () => {
             return;
         }
 
+        if (!isTermsAccepted) {
+            setRegistrationError('You must agree to the Terms and Conditions to proceed.');
+            return;
+        }
+
         if (!referrerAddress) {
             setRegistrationError('Please enter a referrer address');
             return;
@@ -112,7 +122,7 @@ const HomePage: React.FC = () => {
         } catch (err: any) {
             console.error('HomePage: Registration failed:', err);
             const errorMessage = err.message || 'Failed to register';
-            
+
             // Provide more helpful error messages
             if (errorMessage.includes('User already registered')) {
                 setRegistrationError('This wallet is already registered. Redirecting to dashboard...');
@@ -153,7 +163,7 @@ const HomePage: React.FC = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.1 }}
-                        className="text-4xl sm:text-6xl md:text-7xl font-outfit font-black mb-8 leading-[0.9] tracking-tighter text-white"
+                        className="text-3xl sm:text-5xl md:text-6xl font-outfit font-black mb-8 leading-[0.9] tracking-tighter text-white"
                     >
                         Redefine Your <br className="hidden sm:block" />
                         <span className="text-gradient drop-shadow-[0_0_50px_rgba(184,134,11,0.2)]">Digital Legacy</span>
@@ -301,6 +311,20 @@ const HomePage: React.FC = () => {
                                         )}
                                     </div>
 
+                                    {/* Terms Checkbox */}
+                                    <div className="flex items-start gap-3 px-1">
+                                        <input
+                                            type="checkbox"
+                                            id="terms"
+                                            checked={isTermsAccepted}
+                                            onChange={(e) => setIsTermsAccepted(e.target.checked)}
+                                            className="mt-1 w-4 h-4 rounded border-gray-600 bg-black/50 text-obsidian-gold focus:ring-obsidian-gold/50 cursor-pointer"
+                                        />
+                                        <label htmlFor="terms" className="text-xs text-gray-400 leading-relaxed cursor-pointer select-none">
+                                            I agree to the <button type="button" onClick={() => setShowTermsModal(true)} className="text-obsidian-gold hover:underline font-bold">Terms and Conditions</button>. I understand that participation is high-risk, results are not guaranteed, and transactions are irreversible.
+                                        </label>
+                                    </div>
+
                                     {registrationError && (
                                         <motion.div
                                             initial={{ opacity: 0, y: 10 }}
@@ -339,6 +363,9 @@ const HomePage: React.FC = () => {
                     </motion.div>
                 </div>
             </main>
+
+            <Disclaimer />
+            <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
         </div>
     );
 };
