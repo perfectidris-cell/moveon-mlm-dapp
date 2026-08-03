@@ -4,14 +4,14 @@ const hre = require("hardhat");
 const CONTRACT_ADDRESS = "0xAAD29abf34A871Cc0c38Abd80914A202e9300c85";
 
 async function main() {
-    console.log("🧪 Testing MoveOnUpgradeable Contract on Cronos Mainnet\n");
+    console.log("🧪 Testing ParadiseUpgradeable Contract on Cronos Mainnet\n");
 
     // Get deployer
     const [deployer] = await hre.ethers.getSigners();
 
     // Connect to deployed contract (proxy)
-    const MoveOnUpgradeable = await hre.ethers.getContractFactory("MoveOnUpgradeable");
-    const contract = MoveOnUpgradeable.attach(CONTRACT_ADDRESS);
+    const ParadiseUpgradeable = await hre.ethers.getContractFactory("ParadiseUpgradeable");
+    const contract = ParadiseUpgradeable.attach(CONTRACT_ADDRESS);
 
     console.log("📋 Contract Testing:");
     console.log("Deployer:", deployer.address);
@@ -79,7 +79,7 @@ async function main() {
         console.log("- Total Users:", totalUsers.toString());
         console.log("- CRO/USD Price:", (Number(croPrice) / 1e8).toFixed(4));
 
-        console.log("\n🚀 SUCCESS! The MoveOnUpgradeable contract is fully functional on Cronos Mainnet!");
+        console.log("\n🚀 SUCCESS! The ParadiseUpgradeable contract is fully functional on Cronos Mainnet!");
         console.log("💡 All transactions use native CRO");
 
     } catch (error) {

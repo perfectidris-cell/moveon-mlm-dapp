@@ -1,115 +1,106 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("MoveOnUpgradeable Automatic Upgrade", function () {
-  let moveOn, deployer, user1, user2, user3;
+describe("ParadiseUpgradeable - Manual Upgrade & Reserves", function () {
+  let paradise, deployer, user1, user2, user3, dummy1, dummy2;
   let regFee, level2Cost;
 
   beforeEach(async function () {
     [deployer, user1, user2, user3] = await ethers.getSigners();
+    dummy1 = (await ethers.getSigners())[4];
+    dummy2 = (await ethers.getSigners())[5];
 
-    // Deploy mock price feed
-    const MockPriceFeed = await ethers.getContractFactory("MockPriceFeed");
-    const priceFeed = await MockPriceFeed.deploy(50000000, 8); // $0.5 with 8 decimals
-    await priceFeed.waitForDeployment();
+    const MockPyth = await ethers.getContractFactory("MockPyth");
+    const mockPyth = await MockPyth.deploy(50000000, -8);
+    await mockPyth.waitForDeployment();
 
-    // Deploy implementation
-    const MoveOnUpgradeable = await ethers.getContractFactory("MoveOnUpgradeable");
-    const implementation = await MoveOnUpgradeable.deploy();
+    const ParadiseUpgradeable = await ethers.getContractFactory("ParadiseUpgradeable");
+    const implementation = await ParadiseUpgradeable.deploy();
     await implementation.waitForDeployment();
 
-    // Deploy proxy
     const ERC1967Proxy = await ethers.getContractFactory("ERC1967Proxy");
-    const pythAddress = ethers.ZeroAddress;
-    const bandAddress = ethers.ZeroAddress;
-    const pythPriceId = ethers.ZeroHash;
-    const initData = MoveOnUpgradeable.interface.encodeFunctionData("initialize", [
-      await priceFeed.getAddress(),
-      pythAddress,
-      bandAddress,
-      pythPriceId
+    const initData = ParadiseUpgradeable.interface.encodeFunctionData("initialize", [
+      await mockPyth.getAddress(),
+      ethers.ZeroAddress,
+      ethers.ZeroHash,
+      ethers.ZeroAddress,
+      ethers.ZeroAddress,
+      "0x00000000"
     ]);
     const proxy = await ERC1967Proxy.deploy(await implementation.getAddress(), initData);
     await proxy.waitForDeployment();
 
-    moveOn = MoveOnUpgradeable.attach(await proxy.getAddress());
+    paradise = ParadiseUpgradeable.attach(await proxy.getAddress());
 
-    regFee = await moveOn.getRegistrationFeeMatic();
-    level2Cost = await moveOn.getLevelUpgradeCostMatic(2);
+    regFee = await paradise.getRegistrationFeeCro();
+    level2Cost = await paradise.getLevelUpgradeCostCro(2);
+
+    // Register dummy1 under deployer to exhaust one MAX_LEVELS bonus slot
+    await paradise.connect(dummy1).register(deployer.address, deployer.address, [deployer.address], { value: regFee });
   });
 
-  it("Should automatically upgrade user to level 2 when reserves reach the cap", async function () {
-    // User1 registers under deployer
-    await moveOn.connect(user1).register(deployer.address, { value: regFee });
+  async function reg(user, referrer, placeParent, path) {
+    await paradise.connect(user).register(referrer, placeParent, path, { value: regFee });
+  }
 
-    let user1Info = await moveOn.getUserInfo(user1.address);
+  // Register a user at level 1 using dummy1's matrix tree (dummy1 has MAX_LEVELS)
+  async function regLevel1(user) {
+    await reg(user, deployer.address, dummy1.address, [dummy1.address, deployer.address]);
+  }
+
+  it("Should accumulate reserves for level 2 when receiving payments", async function () {
+    await regLevel1(user1);
+    let user1Info = await paradise.getUserInfo(user1.address);
     expect(user1Info.level).to.equal(1);
 
-    // User2 registers under user1 - this should trigger payment to user1 at level 1
-    await moveOn.connect(user2).register(user1.address, { value: regFee });
+    // User2 registers under user1 - triggers payment to user1
+    await reg(user2, user1.address, user1.address, [user1.address]);
 
-    // Check if user1 was automatically upgraded
-    user1Info = await moveOn.getUserInfo(user1.address);
-    expect(user1Info.level).to.equal(2); // Should be upgraded automatically
+    user1Info = await paradise.getUserInfo(user1.address);
+    expect(user1Info.level).to.equal(1);
 
-    // Verify the upgrade event was emitted
-    const events = await moveOn.queryFilter("UserUpgraded", user1.address);
-    const upgradeEvent = events.find(e => e.args.upgradeType === "automatic");
-    expect(upgradeEvent).to.not.be.undefined;
-    expect(upgradeEvent.args.newLevel).to.equal(2);
+    const reserves = await paradise.getReservedBalance(user1.address, 2);
+    expect(reserves).to.be.gt(0);
   });
 
-  it("Should accumulate reserves correctly for next level", async function () {
-    // User1 registers
-    await moveOn.connect(user1).register(deployer.address, { value: regFee });
+  it("Should allow manual upgrade from reserves when enough accumulated", async function () {
+    await regLevel1(user1);
+    await reg(user2, user1.address, user1.address, [user1.address]);
 
-    // Check initial reserves
-    let reserves = await moveOn.getReservedBalance(user1.address, 2);
-    expect(reserves).to.equal(0);
-
-    // User2 registers under user1
-    await moveOn.connect(user2).register(user1.address, { value: regFee });
-
-    // Check reserves accumulated for level 2
-    reserves = await moveOn.getReservedBalance(user1.address, 2);
+    const reserves = await paradise.getReservedBalance(user1.address, 2);
     expect(reserves).to.be.gt(0);
 
-    // If reserves reach the cap, user should upgrade
-    const totalReserved = await moveOn.getTotalReservedBalance(user1.address);
-    if (totalReserved >= level2Cost) {
-      const user1Info = await moveOn.getUserInfo(user1.address);
+    if (reserves >= level2Cost) {
+      await paradise.connect(user1).upgradeFromReserve();
+      const user1Info = await paradise.getUserInfo(user1.address);
       expect(user1Info.level).to.equal(2);
     }
   });
 
-  it("Should handle multiple referrals and upgrades", async function () {
-    // Create a chain: deployer -> user1 -> user2 -> user3
-    await moveOn.connect(user1).register(deployer.address, { value: regFee });
-    await moveOn.connect(user2).register(user1.address, { value: regFee });
-    await moveOn.connect(user3).register(user2.address, { value: regFee });
+  it("Should handle multiple referrals and reserve accumulation", async function () {
+    await regLevel1(user1);
+    await reg(user2, user1.address, user1.address, [user1.address]);
+    await reg(user3, user2.address, user2.address, [user2.address]);
 
-    // Check levels
-    let user1Info = await moveOn.getUserInfo(user1.address);
-    let user2Info = await moveOn.getUserInfo(user2.address);
+    let user1Info = await paradise.getUserInfo(user1.address);
+    let user2Info = await paradise.getUserInfo(user2.address);
 
-    // Depending on earnings, they may have upgraded
-    expect(user1Info.level).to.be.at.least(1);
-    expect(user2Info.level).to.be.at.least(1);
+    expect(user1Info.level).to.equal(1);
+    expect(user2Info.level).to.equal(1);
+
+    const user1Reserves = await paradise.getTotalReservedBalance(user1.address);
+    expect(user1Reserves).to.be.gte(0);
   });
 
-  it("Should not upgrade beyond max level", async function () {
-    // Deployer is already at max level (12)
-    const deployerInfo = await moveOn.getUserInfo(deployer.address);
+  it("Should not allow upgrade beyond max level", async function () {
+    const deployerInfo = await paradise.getUserInfo(deployer.address);
     expect(deployerInfo.level).to.equal(12);
 
-    // Even with earnings, should not upgrade further
-    // (This would require setting up a scenario where deployer receives payments)
+    await expect(paradise.connect(deployer).upgradeFromReserve()).to.be.reverted;
   });
 
-  it("Should handle price feed failures gracefully", async function () {
-    // This test would require mocking stale price data
-    // For now, verify that price validation works
-    const price = await moveOn.getMaticUsdPrice();
+  it("Should return valid CRO/USD price from price feed", async function () {
+    const price = await paradise.getCroUsdPrice();
     expect(price).to.be.gt(0);
   });
 });

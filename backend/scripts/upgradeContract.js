@@ -1,10 +1,10 @@
 const hre = require("hardhat");
 
-// Proxy address from frontend config (Polygon Amoy testnet)
-const PROXY_ADDRESS = "0x96FEF3Ef749b53A383970c88B8D3c64b433b97BF";
+// Proxy address - Cronos Mainnet
+const PROXY_ADDRESS = "0xAAD29abf34A871Cc0c38Abd80914A202e9300c85";
 
 async function main() {
-  console.log("🚀 Upgrading MoveOnUpgradeable contract...\n");
+  console.log("🚀 Upgrading ParadiseUpgradeable contract...\n");
 
   const [deployer] = await hre.ethers.getSigners();
   console.log("Upgrading with account:", deployer.address);
@@ -12,14 +12,14 @@ async function main() {
   try {
     // Check if proxy exists and get current implementation
     console.log("🔍 Checking proxy contract...");
-    const moveOn = await hre.ethers.getContractAt("MoveOnUpgradeable", PROXY_ADDRESS);
-    const currentOwner = await moveOn.owner();
+    const paradise = await hre.ethers.getContractAt("ParadiseUpgradeable", PROXY_ADDRESS);
+    const currentOwner = await paradise.owner();
     console.log("✅ Proxy exists, owner:", currentOwner);
 
     // Deploy new implementation
     console.log("🚀 Deploying optimized implementation...");
-    const MoveOnUpgradeable = await hre.ethers.getContractFactory("MoveOnUpgradeable");
-    const newImplementation = await MoveOnUpgradeable.deploy();
+    const ParadiseUpgradeable = await hre.ethers.getContractFactory("ParadiseUpgradeable");
+    const newImplementation = await ParadiseUpgradeable.deploy();
     await newImplementation.waitForDeployment();
     const newImplementationAddress = await newImplementation.getAddress();
     console.log("✅ New implementation:", newImplementationAddress);
@@ -35,14 +35,14 @@ async function main() {
     console.log("✅ Upgrade complete - Gas used:", receipt.gasUsed.toString());
 
     // Verify upgrade
-    const newOwner = await moveOn.owner();
+    const newOwner = await paradise.owner();
     console.log("✅ Owner verified:", newOwner === currentOwner ? "✓" : "✗");
 
     console.log("\n🎉 UPGRADE SUCCESSFUL!");
     console.log("- Implementation:", newImplementationAddress);
     console.log("- Proxy:", PROXY_ADDRESS);
 
-    return { newImplementation, moveOn };
+    return { newImplementation, paradise };
 
   } catch (error) {
     console.error("❌ Upgrade failed:", error.message);
@@ -52,7 +52,7 @@ async function main() {
 
 main()
   .then((result) => {
-    console.log("\n✅ MOVEON CONTRACT UPGRADE COMPLETED!");
+    console.log("\n✅ PARADISE CONTRACT UPGRADE COMPLETED!");
     console.log("🚀 The contract now includes the fix for upgrade balance release");
     process.exit(0);
   })

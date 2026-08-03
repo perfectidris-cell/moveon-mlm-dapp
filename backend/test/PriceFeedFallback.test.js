@@ -1,76 +1,100 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("MoveOnUpgradeable Price Feed Fallback", function () {
-    let moveOn, chainlink, pyth, band;
+describe("ParadiseUpgradeable Price Feed Fallback", function () {
+    let paradise, pyth, band, supra;
     const pythPriceId = ethers.id("MATIC/USD");
 
     beforeEach(async function () {
         const [deployer] = await ethers.getSigners();
 
         // Deploy mocks
-        const MockPriceFeed = await ethers.getContractFactory("MockPriceFeed");
-        chainlink = await MockPriceFeed.deploy(50000000, 8); // $0.5
-
         const MockPyth = await ethers.getContractFactory("MockPyth");
         pyth = await MockPyth.deploy(500000, -6); // $0.5 ($0.500000)
 
         const MockBand = await ethers.getContractFactory("MockBand");
         band = await MockBand.deploy(ethers.parseUnits("0.5", 18)); // $0.5
 
+        const MockSupraRouter = await ethers.getContractFactory("MockSupraRouter");
+        supra = await MockSupraRouter.deploy(0, 8); // disabled by default (price=0)
+
         // Deploy implementation
-        const MoveOnUpgradeable = await ethers.getContractFactory("MoveOnUpgradeable");
-        const implementation = await MoveOnUpgradeable.deploy();
+        const ParadiseUpgradeable = await ethers.getContractFactory("ParadiseUpgradeable");
+        const implementation = await ParadiseUpgradeable.deploy();
 
         // Deploy proxy
         const ERC1967Proxy = await ethers.getContractFactory("ERC1967Proxy");
-        const initData = MoveOnUpgradeable.interface.encodeFunctionData("initialize", [
-            await chainlink.getAddress(),
+        const initData = ParadiseUpgradeable.interface.encodeFunctionData("initialize", [
             await pyth.getAddress(),
             await band.getAddress(),
-            pythPriceId
+            pythPriceId,
+            await supra.getAddress(),  // Supra router
+            ethers.ZeroAddress,        // Witnet router
+            "0x00000000"               // Witnet price ID
         ]);
         const proxy = await ERC1967Proxy.deploy(await implementation.getAddress(), initData);
-        moveOn = MoveOnUpgradeable.attach(await proxy.getAddress());
+        paradise = ParadiseUpgradeable.attach(await proxy.getAddress());
     });
 
-    it("Should use Chainlink as primary source", async function () {
-        await chainlink.setPrice(60000000); // $0.6
-        const price = await moveOn.getMaticUsdPrice();
-        expect(price).to.equal(60000000);
+    it("Should use Pyth as primary source", async function () {
+        // Pyth is first active feed in priority order (Witnet is not configured)
+        await pyth.setPrice(600000, -6); // $0.6
+        const price = await paradise.getCroUsdPrice();
+        expect(price).to.equal(60000000); // 600000 * 100 = 60000000 (8 decimals)
     });
 
-    it("Should fallback to Pyth if Chainlink is stale", async function () {
-        // Make Chainlink stale (updated 2 days ago)
-        const twoDaysAgo = Math.floor(Date.now() / 1000) - 172800;
+    it("Should fallback to Band if Pyth is stale", async function () {
+        await pyth.setPrice(0, -6);
 
-        // We need to modify MockPriceFeed or use a different mock to control updatedAt
-        // For now, let's just test by disabling chainlink (though it currently doesn't check age deeply in mock)
-
-        // Let's modify MoveOn to check updatedAt against block.timestamp
-        // In our mock, updatedAt is block.timestamp.
-        // So we need to set the price to 0 or something that fails validation.
-        await chainlink.setPrice(0);
-
-        await pyth.setPrice(700000, -6); // $0.7
-        const price = await moveOn.getMaticUsdPrice();
-        expect(price).to.equal(70000000); // Converted to 8 decimals
+        await band.setRate(ethers.parseUnits("0.7", 18)); // $0.7
+        const price = await paradise.getCroUsdPrice();
+        expect(price).to.equal(70000000); // 0.7e18 / 1e10 = 70000000
     });
 
-    it("Should fallback to Band if Chainlink and Pyth fail", async function () {
-        await chainlink.setPrice(0);
+    it("Should fallback to Band if Pyth fails", async function () {
         await pyth.setPrice(0, -6);
 
         await band.setRate(ethers.parseUnits("0.8", 18)); // $0.8
-        const price = await moveOn.getMaticUsdPrice();
+        const price = await paradise.getCroUsdPrice();
         expect(price).to.equal(80000000);
     });
 
     it("Should revert if all feeds fail", async function () {
-        await chainlink.setPrice(0);
+        await supra.setShouldFail(true);
         await pyth.setPrice(0, -6);
         await band.setRate(0);
 
-        await expect(moveOn.getMaticUsdPrice()).to.be.revertedWith("All price feeds failed or are stale");
+        await expect(paradise.getCroUsdPrice()).to.be.revertedWith("All price feeds failed or are stale");
     });
+
+    it("Should use Supra as fallback after Band", async function () {
+        await pyth.setPrice(0, -6);
+        await band.setRate(0);
+
+        await supra.setPrice(9500000); // $0.095 with 8 decimals
+        await supra.setDecimals(8);
+        const price = await paradise.getCroUsdPrice();
+        expect(price).to.equal(9500000);
+    });
+
+    it("Should correctly convert Supra price with 6 decimals to 8", async function () {
+        await pyth.setPrice(0, -6);
+        await band.setRate(0);
+
+        await supra.setPrice(95000);
+        await supra.setDecimals(6);
+        const price = await paradise.getCroUsdPrice();
+        expect(price).to.equal(9500000); // 95000 * 10^(8-6) = 95000 * 100
+    });
+
+    it("Should correctly convert Supra price with 10 decimals to 8", async function () {
+        await pyth.setPrice(0, -6);
+        await band.setRate(0);
+
+        await supra.setPrice(950000000);
+        await supra.setDecimals(10);
+        const price = await paradise.getCroUsdPrice();
+        expect(price).to.equal(9500000); // 950000000 / 10^(10-8) = 950000000 / 100
+    });
+
 });

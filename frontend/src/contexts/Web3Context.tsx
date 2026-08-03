@@ -1,135 +1,171 @@
-import { createContext, useContext, useState, useEffect, type ReactNode, type FC } from 'react';
-import { ethers, type Eip1193Provider } from 'ethers';
-import { useContract } from '../hooks/useContract';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { ethers } from 'ethers';
+import { CRONOS_CHAIN_ID, CRONOS_NETWORK } from '../utils/config';
 
 declare global {
   interface Window {
-    ethereum?: Eip1193Provider & {
-      on?: (event: 'accountsChanged' | 'chainChanged', handler: (...args: any[]) => void) => void;
-      removeAllListeners?: (event: 'accountsChanged' | 'chainChanged') => void;
-    };
+    ethereum?: any;
   }
 }
 
 interface Web3ContextType {
-  account: string | null;
   provider: ethers.BrowserProvider | null;
   signer: ethers.Signer | null;
+  address: string | null;
   chainId: number | null;
+  balance: string;
   isConnecting: boolean;
-  error: string | null;
-  contract: ReturnType<typeof useContract>;
-  connectWallet: () => Promise<void>;
-  disconnectWallet: () => void;
+  isConnected: boolean;
+  readOnlyProvider: ethers.AbstractProvider | null;
+  connect: () => Promise<void>;
+  disconnect: () => void;
+  switchToCronos: () => Promise<void>;
 }
 
-const Web3Context = createContext<Web3ContextType | undefined>(undefined);
+const Web3Context = createContext<Web3ContextType>({
+  provider: null, signer: null, address: null, chainId: null, balance: '0',
+  isConnecting: false, isConnected: false, readOnlyProvider: null,
+  connect: async () => {}, disconnect: () => {}, switchToCronos: async () => {},
+});
 
-export const useWeb3 = () => {
-  const context = useContext(Web3Context);
-  if (!context) {
-    throw new Error('useWeb3 must be used within Web3Provider');
-  }
-  return context;
-};
+export const useWeb3 = () => useContext(Web3Context);
 
-interface Web3ProviderProps {
-  children: ReactNode;
-}
-
-export const Web3Provider: FC<Web3ProviderProps> = ({ children }) => {
-  const [account, setAccount] = useState<string | null>(null);
+export function Web3Provider({ children }: { children: React.ReactNode }) {
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer | null>(null);
+  const [address, setAddress] = useState<string | null>(null);
   const [chainId, setChainId] = useState<number | null>(null);
+  const [balance, setBalance] = useState('0');
   const [isConnecting, setIsConnecting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const hasRestoredRef = useRef(false);
 
-  const contract = useContract(provider || undefined, signer || undefined);
+  const readOnlyProvider = useMemo(() => {
+    for (const url of CRONOS_NETWORK.rpcUrls) {
+      try {
+        const p = new ethers.JsonRpcProvider(url, CRONOS_CHAIN_ID, { staticNetwork: true });
+        return p;
+      } catch {}
+    }
+    return null;
+  }, []);
 
-  const connectWallet = async () => {
+  const fetchBalance = useCallback(async (prov: ethers.BrowserProvider, addr: string) => {
+    try {
+      const bal = await prov.getBalance(addr);
+      setBalance(ethers.formatEther(bal));
+    } catch { setBalance('0'); }
+  }, []);
+
+  const connect = useCallback(async () => {
     if (!window.ethereum) {
-      setError('MetaMask is not installed. Please install MetaMask to use this application.');
+      window.open('https://metamask.io/download/', '_blank');
       return;
     }
-
+    setIsConnecting(true);
     try {
-      setIsConnecting(true);
-      setError(null);
+      const browserProvider = new ethers.BrowserProvider(window.ethereum);
 
-      const browserProvider = new ethers.BrowserProvider(window.ethereum as Eip1193Provider);
-      await browserProvider.send("eth_requestAccounts", []);
-
-      const web3Signer = await browserProvider.getSigner();
-      const address = await web3Signer.getAddress();
+      // Auto-switch to Cronos Testnet if not already
       const network = await browserProvider.getNetwork();
+      if (Number(network.chainId) !== CRONOS_CHAIN_ID) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: CRONOS_NETWORK.chainId }],
+          });
+        } catch (switchError: any) {
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [CRONOS_NETWORK],
+            });
+          }
+        }
+        // Reload provider after switch
+        const newProvider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await newProvider.send('eth_requestAccounts', []);
+        const ethSigner = await newProvider.getSigner();
+        const newNetwork = await newProvider.getNetwork();
+        setProvider(newProvider);
+        setSigner(ethSigner);
+        setAddress(accounts[0]);
+        setChainId(Number(newNetwork.chainId));
+        await fetchBalance(newProvider, accounts[0]);
+        setIsConnecting(false);
+        return;
+      }
+
+      const accounts = await browserProvider.send('eth_requestAccounts', []);
+      const ethSigner = await browserProvider.getSigner();
 
       setProvider(browserProvider);
-      setSigner(web3Signer);
-      setAccount(address);
+      setSigner(ethSigner);
+      setAddress(accounts[0]);
       setChainId(Number(network.chainId));
-    } catch (err: unknown) {
-      console.error('Error connecting wallet:', err);
-      setError(err instanceof Error ? err.message : 'Failed to connect wallet');
+      await fetchBalance(browserProvider, accounts[0]);
+    } catch (err) {
+      console.error('Connection failed:', err);
     } finally {
       setIsConnecting(false);
     }
-  };
+  }, [fetchBalance]);
 
-  const disconnectWallet = () => {
-    setAccount(null);
+  const disconnect = useCallback(() => {
     setProvider(null);
     setSigner(null);
+    setAddress(null);
     setChainId(null);
-    setError(null);
-  };
+    setBalance('0');
+  }, []);
 
-  useEffect(() => {
-    if (window.ethereum) {
-      const ethereum = window.ethereum as Eip1193Provider & {
-        on?: (event: 'accountsChanged' | 'chainChanged', handler: (...args: any[]) => void) => void;
-        removeAllListeners?: (event: 'accountsChanged' | 'chainChanged') => void;
-      };
-      // Handle account changes
-      ethereum.on?.('accountsChanged', (accounts: string[]) => {
-        if (accounts.length > 0) {
-          setAccount(accounts[0]);
-        } else {
-          disconnectWallet();
-        }
+  const switchToCronos = useCallback(async () => {
+    if (!window.ethereum) return;
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: CRONOS_NETWORK.chainId }],
       });
-
-      // Handle chain changes
-      ethereum.on?.('chainChanged', (newChainId: string) => {
-        setChainId(parseInt(newChainId, 16));
-        window.location.reload();
-      });
-
-      // Cleanup listeners
-      return () => {
-        if (window.ethereum) {
-          const ethereum = window.ethereum as Eip1193Provider & {
-            on?: (event: 'accountsChanged' | 'chainChanged', handler: (...args: any[]) => void) => void;
-            removeAllListeners?: (event: 'accountsChanged' | 'chainChanged') => void;
-          };
-          ethereum.removeAllListeners?.('accountsChanged');
-          ethereum.removeAllListeners?.('chainChanged');
-        }
-      };
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [CRONOS_NETWORK],
+        });
+      }
     }
   }, []);
 
-  const value: Web3ContextType = {
-    account,
-    provider,
-    signer,
-    chainId,
-    isConnecting,
-    error,
-    contract,
-    connectWallet,
-    disconnectWallet,
-  };
+  useEffect(() => {
+    if (!window.ethereum || hasRestoredRef.current) return;
+    hasRestoredRef.current = true;
 
-  return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;
-};
+    const ethereum = window.ethereum;
+    ethereum.request({ method: 'eth_accounts' }).then((accounts: string[]) => {
+      if (accounts.length > 0) connect();
+    }).catch(() => {});
+
+    const handleAccountsChanged = (accounts: string[]) => {
+      if (accounts.length === 0) { disconnect(); return; }
+      setAddress(accounts[0]);
+      if (provider) fetchBalance(provider, accounts[0]);
+    };
+    const handleChainChanged = () => { window.location.reload(); };
+
+    ethereum.on('accountsChanged', handleAccountsChanged);
+    ethereum.on('chainChanged', handleChainChanged);
+    return () => {
+      ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      ethereum.removeListener('chainChanged', handleChainChanged);
+    };
+  }, [connect, disconnect, provider, fetchBalance]);
+
+  return (
+    <Web3Context.Provider value={{
+      provider, signer, address, chainId, balance,
+      isConnecting, isConnected: !!address,
+      readOnlyProvider, connect, disconnect, switchToCronos,
+    }}>
+      {children}
+    </Web3Context.Provider>
+  );
+}

@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "MOVE-ON MLM Smart Contract Backend",
+  "description": "Paradise MLM Smart Contract Backend",
   "main": "hardhat.config.js",
   "directories": {
     "test": "test"
@@ -10,11 +10,8 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deployUpgradeable.js",
-    "deploy:network": "hardhat run scripts/deployUpgradeable.js --network amoy",
     "deploy:cronos:testnet": "hardhat run scripts/deployCronosTestnet.js --network cronosTestnet",
-    "deploy:cronos:mainnet": "hardhat run scripts/deployCronosMainnet.js --network cronos",
-    "test:tokens": "hardhat run scripts/testWithTokens.js --network amoy",
-    "verify": "hardhat run scripts/verifyDeployment.js --network amoy"
+    "deploy:cronos:mainnet": "hardhat run scripts/deployCronosMainnet.js --network cronos"
   },
   "keywords": [
     "blockchain",
@@ -26,7 +23,6 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@chainlink/contracts": "^0.8.0",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.4.0",
     "dotenv": "^16.3.1",

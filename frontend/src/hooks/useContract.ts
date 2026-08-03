@@ -1,121 +1,507 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../utils/config';
+import { getContract } from '../utils/config';
+import { useWeb3 } from '../contexts/Web3Context';
+import type { UserInfo, UserFinancialInfo } from '../types';
 
-export const useContract = (provider?: ethers.BrowserProvider, signer?: ethers.Signer) => {
-    const contract = useMemo(() => {
-        if (!provider) return null;
+const GAS_BUFFER = 120n;
+const GAS_FLOOR = 300000n;
+const GAS_CEILING = 3000000n;
+const RETRY_COUNT = 3;
+const RETRY_DELAY = 1000;
+const CACHE_TTL = 120000;
+const LONG_CACHE_TTL = 300000;
 
-        const contractInterface = new ethers.Interface(CONTRACT_ABI);
-        return new ethers.Contract(CONTRACT_ADDRESS, contractInterface, signer || provider);
-    }, [provider, signer]);
+const cache = new Map<string, { value: unknown; expiry: number }>();
 
-    const getUserInfo = async (userAddress: string) => {
-        if (!contract) throw new Error('Contract not initialized');
+function cacheGet<T>(key: string): T | null {
+  const entry = cache.get(key);
+  if (entry && Date.now() < entry.expiry) return entry.value as T;
+  cache.delete(key);
+  return null;
+}
 
-        // Get basic user info (returns 8 values)
-        const basicInfo = await contract.getUserInfo(userAddress);
+function cacheSet(key: string, value: unknown, ttl = CACHE_TTL) {
+  cache.set(key, { value, expiry: Date.now() + ttl });
+}
 
-        // Get financial info (returns 5 values: 3 arrays of 13 elements each + 2 totals)
-        const financialInfo = await contract.getUserFinancialInfo(userAddress);
+async function retryWrapper<T>(fn: () => Promise<T>, label: string): Promise<T> {
+  for (let i = 0; i < RETRY_COUNT; i++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      if (i === RETRY_COUNT - 1) throw err;
+      if (err?.code === 'CALL_EXCEPTION' || err?.code === -32000) throw err;
+      await new Promise((r) => setTimeout(r, RETRY_DELAY));
+    }
+  }
+  throw new Error(`RPC failed after ${RETRY_COUNT} retries: ${label}`);
+}
 
-        return {
-            id: basicInfo[0],
-            referrer: basicInfo[1],
-            level: Number(basicInfo[2]),
-            directReferrals: Number(basicInfo[3]),
-            totalReferrals: Number(basicInfo[4]),
-            totalEarnings: ethers.formatEther(basicInfo[5]),
-            lastActiveTime: Number(basicInfo[6]),
-            isExpired: basicInfo[7],
-            levelEarnings: financialInfo[0].map((e: bigint) => ethers.formatEther(e)),
-            reservedForUpgrade: financialInfo[1].map((r: bigint) => ethers.formatEther(r)),
-            withdrawableBalance: financialInfo[2].map((w: bigint) => ethers.formatEther(w)),
-            totalWithdrawableBalance: ethers.formatEther(financialInfo[3]),
-            totalReservedBalance: ethers.formatEther(financialInfo[4])
-        };
+async function estimateAndSend(
+  contract: ethers.Contract,
+  method: string,
+  args: unknown[],
+  overrides: Record<string, any> = {},
+): Promise<ethers.TransactionReceipt> {
+  let gasLimit = overrides.gasLimit;
+  if (!gasLimit) {
+    try {
+      const estimated = await contract[method].estimateGas(...args, overrides);
+      gasLimit = (estimated * GAS_BUFFER) / 100n;
+      if (gasLimit < GAS_FLOOR) gasLimit = GAS_FLOOR;
+      if (gasLimit > GAS_CEILING) gasLimit = GAS_CEILING;
+    } catch {
+      gasLimit = GAS_FLOOR;
+    }
+  }
+  const tx = await contract[method](...args, { ...overrides, gasLimit });
+  return await tx.wait();
+}
+
+function normalizeWei(val: string): string {
+  if (/e/i.test(val)) {
+    const [base, expStr] = val.split('e');
+    const exp = parseInt(expStr);
+    const [int = '0', dec = ''] = base.split('.');
+    const digits = (int + dec).replace(/^0+/, '') || '0';
+    const dotPos = int.length;
+    const newDotPos = dotPos + exp;
+    if (newDotPos <= 0) {
+      return '0.' + '0'.repeat(-newDotPos) + digits;
+    }
+    if (newDotPos >= digits.length) {
+      return digits + '0'.repeat(newDotPos - digits.length);
+    }
+    return digits.slice(0, newDotPos) + '.' + digits.slice(newDotPos);
+  }
+  return val;
+}
+
+export function useContract() {
+  const { provider, signer, readOnlyProvider } = useWeb3();
+
+  const readContract = useMemo(() => {
+    if (readOnlyProvider) return getContract(readOnlyProvider);
+    if (provider) return getContract(provider);
+    return null;
+  }, [readOnlyProvider, provider]);
+  const writeContract = useMemo(() => signer ? getContract(signer) : null, [signer]);
+
+  const getUserInfo = useCallback(async (addr: string, force = false): Promise<UserInfo> => {
+    if (!readContract) throw new Error('Not connected');
+    const key = `userInfo_${addr.toLowerCase()}`;
+    if (!force) {
+      const cached = cacheGet<UserInfo>(key);
+      if (cached) return cached;
+    }
+    const r = await retryWrapper(() => readContract.getUserInfo(addr), 'getUserInfo');
+    const res: UserInfo = {
+      id: r.id, referrer: r.referrer, level: Number(r.level),
+      directReferrals: Number(r.directReferrals), totalReferrals: Number(r.totalReferrals),
+      totalEarnings: normalizeWei(r.totalEarnings.toString()),
+      lastActiveTime: Number(r.lastActiveTime),
     };
+    cacheSet(key, res, 30000);
+    return res;
+  }, [readContract]);
 
-    const register = async (referrer: string, value: string) => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
-
-        const tx = await contract.register(referrer, { value: ethers.parseEther(value) });
-        return await tx.wait();
+  const getUserFinancialInfo = useCallback(async (addr: string): Promise<UserFinancialInfo> => {
+    if (!readContract) throw new Error('Not connected');
+    const r = await readContract.getUserFinancialInfo(addr);
+    return {
+      levelEarnings: r.levelEarnings.map((e: bigint) => normalizeWei(e.toString())),
+      reservedForUpgrade: r.reservedForUpgrade.map((e: bigint) => normalizeWei(e.toString())),
+      withdrawableBalance: r.withdrawableBalance ? r.withdrawableBalance.map((e: bigint) => normalizeWei(e.toString())) : undefined,
+      totalWithdrawableBalance: r.totalWithdrawableBalance ? normalizeWei(r.totalWithdrawableBalance.toString()) : undefined,
+      totalReservedBalance: normalizeWei(r.totalReservedBalance.toString()),
     };
+  }, [readContract]);
 
-    const quickUpgrade = async (level: number) => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
+  const getSystemInfoCached = useCallback(async () => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<{ regFee: string; croPrice: string; totalUsers: number; levelCosts: Record<number, string> }>('systemInfo');
+    if (cached) return cached;
 
-        const tx = await contract.quickUpgrade(level);
-        return await tx.wait();
-    };
+    let r;
+    try {
+      r = await retryWrapper(() => readContract.getSystemInfo(), 'getSystemInfo');
+    } catch {
+      return { regFee: '0', croPrice: '0', totalUsers: 0, levelCosts: {} };
+    }
+    const croPrice = (Number(r.croUsdPrice) / 1e8).toFixed(4);
+    const regFee = ethers.formatEther(r.registrationFeeCro);
+    const totalUsers = Number(r.totalUsers);
+    const levelCosts: Record<number, string> = {};
+    for (let i = 0; i < r.levelCostsCro.length; i++) {
+      const level = i + 1;
+      const formatted = ethers.formatEther(r.levelCostsCro[i]);
+      levelCosts[level] = formatted;
+      cacheSet(`levelCost_${level}`, formatted, LONG_CACHE_TTL);
+    }
+    const result = { regFee, croPrice, totalUsers, levelCosts };
+    cacheSet('systemInfo', result, LONG_CACHE_TTL);
+    cacheSet('regFee', regFee, LONG_CACHE_TTL);
+    cacheSet('croPrice', croPrice, LONG_CACHE_TTL);
+    return result;
+  }, [readContract]);
 
-    const walletUpgrade = async (level: number, value: string) => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
+  const getRegistrationFee = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<string>('regFee');
+    if (cached) return cached;
+    const { regFee } = await getSystemInfoCached();
+    return regFee;
+  }, [readContract, getSystemInfoCached]);
 
-        const tx = await contract.walletUpgrade(level, { value: ethers.parseEther(value) });
-        return await tx.wait();
-    };
+  const getLevelCost = useCallback(async (level: number): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<string>(`levelCost_${level}`);
+    if (cached) return cached;
+    const cost = await retryWrapper(() => readContract.getLevelUpgradeCostCro(level), 'getLevelUpgradeCostCro');
+    const formatted = ethers.formatEther(cost);
+    cacheSet(`levelCost_${level}`, formatted);
+    return formatted;
+  }, [readContract]);
 
-    const withdrawFromLevel = async (level: number, amount: string) => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
+  const getLevelCostsBatch = useCallback(async (levels: number[]): Promise<Record<number, string>> => {
+    if (!readContract) throw new Error('Not connected');
+    if (levels.length === 0) return {};
+    const uncached: number[] = [];
+    const result: Record<number, string> = {};
+    for (const lvl of levels) {
+      const cached = cacheGet<string>(`levelCost_${lvl}`);
+      if (cached) {
+        result[lvl] = cached;
+      } else {
+        uncached.push(lvl);
+      }
+    }
+    if (uncached.length > 0) {
+      const r = await retryWrapper(() => readContract.getLevelCostsCroBatch(uncached), 'getLevelCostsCroBatch');
+      for (let i = 0; i < uncached.length; i++) {
+        const formatted = ethers.formatEther(r[i]);
+        result[uncached[i]] = formatted;
+        cacheSet(`levelCost_${uncached[i]}`, formatted);
+      }
+    }
+    return result;
+  }, [readContract]);
 
-        const tx = await contract.withdrawFromLevel(level, ethers.parseEther(amount));
-        return await tx.wait();
-    };
+  const getTotalUsers = useCallback(async (): Promise<number> => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<number>('totalUsers');
+    if (cached) return cached;
+    const n = await retryWrapper(() => readContract.getTotalUsers(), 'getTotalUsers');
+    cacheSet('totalUsers', Number(n));
+    return Number(n);
+  }, [readContract]);
 
-    const withdrawAllWithdrawable = async () => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
+  const getCroPrice = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<string>('croPrice');
+    if (cached) return cached;
+    const { croPrice } = await getSystemInfoCached();
+    return croPrice;
+  }, [readContract, getSystemInfoCached]);
 
-        const tx = await contract.withdrawAllWithdrawable();
-        return await tx.wait();
-    };
+  const getDownline = useCallback(async (addr: string, depth: number = 3): Promise<string[]> => {
+    if (!readContract) throw new Error('Not connected');
+    return [...(await readContract.getDownline(addr, depth))];
+  }, [readContract]);
 
-    const getRegistrationFeeCro = async () => {
-        if (!contract) throw new Error('Contract not initialized');
+  const getUserAddressesPaginated = useCallback(async (start: number, count: number): Promise<string[]> => {
+    if (!readContract) throw new Error('Not connected');
+    return [...(await readContract.getUserAddressesPaginated(start, count))];
+  }, [readContract]);
 
-        const fee = await contract.getRegistrationFeeCro();
-        return ethers.formatEther(fee);
-    };
+  const getUserParentInfo = useCallback(async (addr: string): Promise<{ referrer: string; referrerLevel: number }> => {
+    if (!readContract) throw new Error('Not connected');
+    const r = await readContract.getUserParentInfo(addr);
+    return { referrer: r.referrer, referrerLevel: Number(r.referrerLevel) };
+  }, [readContract]);
 
-    const getLevelUpgradeCostCro = async (level: number) => {
-        if (!contract) throw new Error('Contract not initialized');
+  const getMatrixChildren = useCallback(async (addr: string, force = false): Promise<string[]> => {
+    if (!readContract) throw new Error('Not connected');
+    const key = `matrixChildren_${addr.toLowerCase()}`;
+    if (!force) {
+      const cached = cacheGet<string[]>(key);
+      if (cached) return cached;
+    }
+    const children = await retryWrapper(() => readContract.getMatrixChildren(addr), 'getMatrixChildren');
+    const res = [...children];
+    cacheSet(key, res, 30000);
+    return res;
+  }, [readContract]);
 
-        const cost = await contract.getLevelUpgradeCostCro(level);
-        return ethers.formatEther(cost);
-    };
+  const getMatrixParent = useCallback(async (addr: string, force = false): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const key = `matrixParent_${addr.toLowerCase()}`;
+    if (!force) {
+      const cached = cacheGet<string>(key);
+      if (cached) return cached;
+    }
+    const parent = await retryWrapper(() => readContract.matrixParent(addr), 'matrixParent');
+    cacheSet(key, parent, 60000);
+    return parent;
+  }, [readContract]);
 
-    const reactivateAccount = async (value: string) => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
+  const getUserInfosBatch = useCallback(async (addresses: string[], force = false): Promise<UserInfo[]> => {
+    if (!readContract) throw new Error('Not connected');
+    if (addresses.length === 0) return [];
 
-        const tx = await contract.reactivateAccount({ value: ethers.parseEther(value) });
-        return await tx.wait();
-    };
+    if (!force) {
+      const allCached = addresses.map((a) => cacheGet<UserInfo>(`userInfo_${a.toLowerCase()}`));
+      if (allCached.every((item) => item !== null)) {
+        return allCached as UserInfo[];
+      }
+    }
 
-    const checkInactiveUsers = async () => {
-        if (!contract || !signer) throw new Error('Signer required for transactions');
+    const r = await retryWrapper(() => readContract.getUserInfosBatch(addresses), 'getUserInfosBatch');
+    if (!r) return [];
+    const ids = r.ids || r[0];
+    const refs = r.referrers || r[1];
+    const lvls = r.levels || r[2];
+    const dirs = r.directReferrals || r[3];
+    const totRefs = r.totalReferrals || r[4];
+    const earn = r.totalEarnings || r[5];
+    const times = r.lastActiveTimes || r[6];
+    const n = Math.min(addresses.length, ids.length, lvls.length, earn.length);
+    const out: UserInfo[] = [];
+    for (let i = 0; i < n; i++) {
+      const info: UserInfo = {
+        id: ids[i] || ethers.ZeroAddress,
+        referrer: refs[i] || ethers.ZeroAddress,
+        level: Number(lvls[i] ?? 0),
+        directReferrals: Number(dirs[i] ?? 0),
+        totalReferrals: Number(totRefs[i] ?? 0),
+        totalEarnings: normalizeWei((earn[i] ?? 0n).toString()),
+        lastActiveTime: Number(times[i] ?? 0),
+      };
+      out.push(info);
+      if (addresses[i]) {
+        cacheSet(`userInfo_${addresses[i].toLowerCase()}`, info, 30000);
+      }
+    }
+    return out;
+  }, [readContract]);
 
-        const tx = await contract.checkInactiveUsers();
-        return await tx.wait();
-    };
+  const findNextMatrixSlot = useCallback(async (rootAddr: string): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const slot = await retryWrapper(() => readContract.findNextSlot(rootAddr), 'findNextSlot');
+    if (slot === ethers.ZeroAddress) throw new Error('Tree full');
+    return slot;
+  }, [readContract]);
 
-    const getDownline = async (userAddress: string, depth: number) => {
-        if (!contract) throw new Error('Contract not initialized');
-        return await contract.getDownline(userAddress, depth);
-    };
+  const buildPathProof = useCallback(async (_placementParent: string, _referrer: string): Promise<string[]> => {
+    if (!readContract) throw new Error('Not connected');
+    if (_placementParent.toLowerCase() === _referrer.toLowerCase()) return [_placementParent];
+    const path: string[] = [_placementParent];
+    let current = _placementParent;
+    for (let i = 0; i < 50; i++) {
+      const parent = await readContract.matrixParent(current);
+      if (parent === ethers.ZeroAddress) break;
+      current = parent;
+      path.push(current);
+      if (current.toLowerCase() === _referrer.toLowerCase()) return path;
+    }
+    throw new Error('Cannot build path proof: _placementParent not in _referrer matrix tree');
+  }, [readContract]);
 
-    return useMemo(() => ({
-        contract,
-        getUserInfo,
-        register,
-        quickUpgrade,
-        walletUpgrade,
-        withdrawFromLevel,
-        withdrawAllWithdrawable,
-        getRegistrationFeeCro,
-        getLevelUpgradeCostCro,
-        reactivateAccount,
-        checkInactiveUsers,
-        getDownline
-    }), [contract, provider, signer]);
-};
+  const getDownlineUpTo62 = useCallback(async (addr: string): Promise<string[]> => {
+    if (!readContract) throw new Error('Not connected');
+    return [...(await readContract.getDownlineUpTo62(addr))];
+  }, [readContract]);
+
+  const getPaused = useCallback(async (): Promise<boolean> => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<boolean>('paused');
+    if (cached !== null) return cached;
+    const p = await retryWrapper(() => readContract.paused(), 'paused');
+    cacheSet('paused', p, CACHE_TTL);
+    return p;
+  }, [readContract]);
+
+  const getPendingWithdrawal = useCallback(async (addr: string): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const cached = cacheGet<string>(`pendWith_${addr}`);
+    if (cached !== null) return cached;
+    const bal = await retryWrapper(() => readContract.pendingWithdrawals(addr), 'pendingWithdrawals');
+    const formatted = ethers.formatEther(bal);
+    cacheSet(`pendWith_${addr}`, formatted, 5000);
+    return formatted;
+  }, [readContract]);
+
+  const getTotalWithdrawableBalance = useCallback(async (addr: string): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const bal = await retryWrapper(() => readContract.getTotalWithdrawableBalance(addr), 'getTotalWithdrawableBalance');
+    return ethers.formatEther(bal);
+  }, [readContract]);
+
+  const getDownlinePaginated = useCallback(async (addr: string, depth: number, offset: number, count: number): Promise<{ members: string[]; total: number }> => {
+    if (!readContract) throw new Error('Not connected');
+    const r = await retryWrapper(() => readContract.getDownlinePaginated(addr, depth, offset, count), 'getDownlinePaginated');
+    return { members: [...r.members], total: Number(r.total) };
+  }, [readContract]);
+
+  const register = useCallback(async (referrer: string, matrixParent: string, pathProof: string[], valueCRO: string): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'register', [referrer, matrixParent, pathProof], {
+      value: ethers.parseEther(valueCRO),
+    });
+  }, [writeContract]);
+
+  const walletUpgrade = useCallback(async (valueCRO: string): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'walletUpgrade', [], {
+      value: ethers.parseEther(valueCRO),
+    });
+  }, [writeContract]);
+
+  const upgradeFromReserve = useCallback(async (): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'upgradeFromReserve', []);
+  }, [writeContract]);
+
+  const withdraw = useCallback(async (): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'withdraw', []);
+  }, [writeContract]);
+
+  const togglePause = useCallback(async (): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'togglePause', []);
+  }, [writeContract]);
+
+  const getOwner = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.owner();
+  }, [readContract]);
+
+  const getManualCroUsdPrice = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const price = await readContract.manualCroUsdPrice();
+    return price.toString();
+  }, [readContract]);
+
+  const getManualRegistrationFeeCro = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const fee = await readContract.manualRegistrationFeeCro();
+    return fee.toString();
+  }, [readContract]);
+
+  const getManualLevelCostCro = useCallback(async (level: number): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    const cost = await readContract.manualLevelCostsCro(level);
+    return cost.toString();
+  }, [readContract]);
+
+  const getManualLevelCostsBatch = useCallback(async (): Promise<string[]> => {
+    if (!readContract) throw new Error('Not connected');
+    const results = await Promise.all(
+      Array.from({ length: 13 }, (_, i) =>
+        readContract.manualLevelCostsCro(i).then((c: bigint) => c.toString()).catch(() => '0')
+      )
+    );
+    return results;
+  }, [readContract]);
+
+  const getReferralCap = useCallback(async (): Promise<number> => {
+    if (!readContract) throw new Error('Not connected');
+    const cap = await readContract.referralCap();
+    return Number(cap);
+  }, [readContract]);
+
+  const setManualCroUsdPrice = useCallback(async (price: string): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'setManualCroUsdPrice', [price]);
+  }, [writeContract]);
+
+  const setManualCroCosts = useCallback(async (regFeeCro: string, levelCostsCro: string[]): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    const padded = [...levelCostsCro];
+    while (padded.length < 13) padded.push('0');
+    return estimateAndSend(writeContract, 'setManualCroCosts', [regFeeCro, padded]);
+  }, [writeContract]);
+
+  const setReferralCap = useCallback(async (cap: number): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'setReferralCap', [cap]);
+  }, [writeContract]);
+
+  const setUserLevel = useCallback(async (user: string, level: number): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'setUserLevel', [user, level]);
+  }, [writeContract]);
+
+  const getPythAddress = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.pyth();
+  }, [readContract]);
+
+  const getBandAddress = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.band();
+  }, [readContract]);
+
+  const getPythPriceId = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.pythPriceId();
+  }, [readContract]);
+
+  const getSupraRouter = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.supraRouter();
+  }, [readContract]);
+
+  const getWitnetRouter = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.witnetRouter();
+  }, [readContract]);
+
+  const getWitnetPriceId = useCallback(async (): Promise<string> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.witnetPriceId();
+  }, [readContract]);
+
+  const setPriceFeeds = useCallback(async (pyth: string, band: string, pythPriceId: string): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'setPriceFeeds', [pyth, band, pythPriceId]);
+  }, [writeContract]);
+
+  const setNewPriceFeeds = useCallback(async (pyth: string, band: string, pythPriceId: string, supra: string, witnet: string, witnetId: string): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'setNewPriceFeeds', [pyth, band, pythPriceId, supra, witnet, witnetId]);
+  }, [writeContract]);
+
+  const migrateUserBatch = useCallback(async (startIndex: number, batchSize: number): Promise<ethers.TransactionReceipt> => {
+    if (!writeContract) throw new Error('Wallet not connected');
+    return estimateAndSend(writeContract, 'migrateUserBatch', [startIndex, batchSize]);
+  }, [writeContract]);
+
+  const getMigratedCount = useCallback(async (): Promise<number> => {
+    if (!readContract) throw new Error('Not connected');
+    return Number(await readContract.getMigratedCount());
+  }, [readContract]);
+
+  const getIsMigrated = useCallback(async (addr: string): Promise<boolean> => {
+    if (!readContract) throw new Error('Not connected');
+    return await readContract.isMigrated(addr);
+  }, [readContract]);
+
+  return useMemo(() => ({
+    readContract, writeContract,
+    getUserInfo, getUserFinancialInfo, getSystemInfoCached, getRegistrationFee, getLevelCost, getLevelCostsBatch,
+    getTotalUsers, getCroPrice, getDownline, getDownlinePaginated,
+    getUserAddressesPaginated, getUserInfosBatch, getUserParentInfo,
+    getMatrixChildren, getMatrixParent, findNextMatrixSlot, buildPathProof, getDownlineUpTo62,
+    getPaused, togglePause,
+    getOwner, getManualCroUsdPrice, getManualRegistrationFeeCro, getManualLevelCostCro, getManualLevelCostsBatch, getReferralCap,
+    setManualCroUsdPrice, setManualCroCosts, setReferralCap, setUserLevel,
+    getPythAddress, getBandAddress, getPythPriceId, getSupraRouter, getWitnetRouter, getWitnetPriceId,
+    setPriceFeeds, setNewPriceFeeds,
+    register, walletUpgrade,
+    upgradeFromReserve, withdraw, getPendingWithdrawal, getTotalWithdrawableBalance,
+    migrateUserBatch, getMigratedCount, getIsMigrated,
+  }), [readContract, writeContract, getUserInfo, getUserFinancialInfo, getSystemInfoCached, getRegistrationFee, getLevelCost, getLevelCostsBatch, getTotalUsers, getCroPrice, getDownline, getDownlinePaginated, getUserAddressesPaginated, getUserInfosBatch, getUserParentInfo, getMatrixChildren, getMatrixParent, findNextMatrixSlot, buildPathProof, getDownlineUpTo62, getPaused, togglePause, getOwner, getManualCroUsdPrice, getManualRegistrationFeeCro, getManualLevelCostCro, getReferralCap, setManualCroUsdPrice, setManualCroCosts, setReferralCap, setUserLevel, getPythAddress, getBandAddress, getPythPriceId, getSupraRouter, getWitnetRouter, getWitnetPriceId, setPriceFeeds, setNewPriceFeeds, register, walletUpgrade, upgradeFromReserve, withdraw, getPendingWithdrawal, getTotalWithdrawableBalance, migrateUserBatch, getMigratedCount, getIsMigrated]);
+}

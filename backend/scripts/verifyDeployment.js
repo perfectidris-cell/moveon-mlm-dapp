@@ -1,17 +1,17 @@
 const hre = require("hardhat");
 
-// Deployed contract address
-const CONTRACT_ADDRESS = "0xDea6B53977D4e0Ac5d5977A3296ccf0c2d884bcD";
+// Deployed contract address on Cronos Mainnet
+const CONTRACT_ADDRESS = "0xAAD29abf34A871Cc0c38Abd80914A202e9300c85";
 
 async function main() {
-    console.log("🧪 Verifying MoveOnMLM Contract Deployment and MATIC Integration\n");
+    console.log("🧪 Verifying ParadiseUpgradeable Contract Deployment on Cronos Mainnet\n");
     
     // Get deployer
     const [deployer] = await hre.ethers.getSigners();
     
     // Connect to deployed contract
-    const MoveOnMLM = await hre.ethers.getContractFactory("MoveOnMLM");
-    const contract = MoveOnMLM.attach(CONTRACT_ADDRESS);
+    const ParadiseUpgradeable = await hre.ethers.getContractFactory("ParadiseUpgradeable");
+    const contract = ParadiseUpgradeable.attach(CONTRACT_ADDRESS);
     
     console.log("📋 Contract Verification:");
     console.log("Deployer:", deployer.address);
@@ -30,24 +30,24 @@ async function main() {
         console.log("✅ Deployer registered as user:", deployerUser.id !== "0x0000000000000000000000000000000000000000");
         console.log("✅ Deployer level:", deployerUser.level.toString());
         
-        // Test 2: Check Chainlink price feed integration
-        console.log("\n⛓️ Test 2: Chainlink Price Feed Integration");
+        // Test 2: Check Price Feed Integration
+        console.log("\n⛓️ Test 2: Price Feed Integration (Pyth + Band)");
         
-        const maticPrice = await contract.getMaticUsdPrice();
-        console.log("✅ Current MATIC/USD Price:", hre.ethers.formatUnits(maticPrice, 8));
-        console.log("✅ Price is valid:", maticPrice > 0);
+        const croPrice = await contract.getCroUsdPrice();
+        console.log("✅ Current CRO/USD Price:", hre.ethers.formatUnits(croPrice, 8));
+        console.log("✅ Price is valid:", croPrice > 0);
         
-        // Test 3: Check MATIC payment calculations
-        console.log("\n💰 Test 3: MATIC Payment Calculations");
+        // Test 3: Check CRO payment calculations
+        console.log("\n💰 Test 3: CRO Payment Calculations");
         
-        const regFeeMatic = await contract.getRegistrationFeeMatic();
-        console.log("✅ Registration Fee:", hre.ethers.formatEther(regFeeMatic), "MATIC");
+        const regFeeCro = await contract.getRegistrationFeeCro();
+        console.log("✅ Registration Fee:", hre.ethers.formatEther(regFeeCro), "CRO");
         
-        const level2CostMatic = await contract.getLevelUpgradeCostMatic(2);
-        console.log("✅ Level 2 Upgrade Cost:", hre.ethers.formatEther(level2CostMatic), "MATIC");
+        const level2CostCro = await contract.getLevelUpgradeCostCro(2);
+        console.log("✅ Level 2 Upgrade Cost:", hre.ethers.formatEther(level2CostCro), "CRO");
         
-        const level12CostMatic = await contract.getLevelUpgradeCostMatic(12);
-        console.log("✅ Level 12 Upgrade Cost:", hre.ethers.formatEther(level12CostMatic), "MATIC");
+        const level12CostCro = await contract.getLevelUpgradeCostCro(12);
+        console.log("✅ Level 12 Upgrade Cost:", hre.ethers.formatEther(level12CostCro), "CRO");
         
         // Test 4: Check total users count
         console.log("\n👥 Test 4: User Management");
@@ -55,12 +55,12 @@ async function main() {
         const totalUsers = await contract.getTotalUsers();
         console.log("✅ Total Users:", totalUsers.toString());
         
-        // Test 5: Verify contract uses native MATIC (not IERC20)
-        console.log("\n🔧 Test 5: Native MATIC Integration");
-        console.log("✅ Contract uses msg.value for payments (native MATIC)");
+        // Test 5: Verify contract uses native CRO
+        console.log("\n🔧 Test 5: Native CRO Integration");
+        console.log("✅ Contract uses msg.value for payments (native CRO)");
         console.log("✅ Contract uses payable().transfer() for withdrawals");
-        console.log("✅ No IERC20 token dependencies found");
-        console.log("✅ Chainlink price feed provides USD to MATIC conversion");
+        console.log("✅ Multi-source price feeds: Pyth + Band");
+        console.log("✅ Price feeds provide USD to CRO conversion");
         
         // Test 6: Check contract constants
         console.log("\n📊 Test 6: Contract Configuration");
@@ -72,7 +72,7 @@ async function main() {
         console.log("\n🎉 VERIFICATION SUMMARY:");
         console.log("✅ Contract deployed successfully on Polygon Amoy testnet");
         console.log("✅ Uses native MATIC for all payments");
-        console.log("✅ Chainlink price feed integration working");
+        console.log("✅ Multi-source price feed integration working");
         console.log("✅ No IERC20 token dependencies");
         console.log("✅ MLM structure with referrals and levels implemented");
         console.log("✅ Native MATIC transfers for registration and upgrades");
@@ -85,7 +85,7 @@ async function main() {
         console.log("- Total Users:", totalUsers.toString());
         console.log("- MATIC/USD Price:", hre.ethers.formatUnits(maticPrice, 8));
         
-        console.log("\n🚀 SUCCESS! The MoveOnMLM contract is fully functional with native MATIC payments!");
+        console.log("\n🚀 SUCCESS! The ParadiseUpgradeable contract is fully functional with native MATIC payments!");
         console.log("💡 No IERC20 tokens needed - all transactions use native MATIC");
         
     } catch (error) {

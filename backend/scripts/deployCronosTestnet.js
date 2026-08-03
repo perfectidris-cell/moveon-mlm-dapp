@@ -1,75 +1,101 @@
 const hre = require("hardhat");
 
 // Oracle Addresses (Cronos Testnet)
-const CHAINLINK_PRICE_FEED = ethers.ZeroAddress; // Not available/found for CRO/USD on Cronos Testnet
-const PYTH_ADDRESS = "0x36825bf3fbdf5a29e2d5148bfe7dcf7b5639e320";
-const BAND_ADDRESS = "0xD0b2234eB9431e850a814bCdcBCB18C1093F986B";
-const PYTH_PRICE_ID = "0x23199c2bcb1303f667e733b9934db9eca5991e765b45f5ed18bc4b231415f2fe";
+const PYTH_ADDRESS = "0x36825bf3fbdf5a29e2d5148bfe7dcf7b5639e320"; // Pyth on Cronos Testnet
+const BAND_ADDRESS = "0xD0b2234eB9431e850a814bCdcBCB18C1093F986B";  // Band on Cronos Testnet
+const PYTH_PRICE_ID = "0x23199c2bcb1303f667e733b9934db9eca5991e765b45f5ed18bc4b231415f2fe"; // CRO/USD
+const SUPRA_ROUTER = ethers.ZeroAddress;     // Not available on Cronos Testnet
+const WITNET_ROUTER = ethers.ZeroAddress;    // No CRO/USD feed on Cronos Testnet
+const WITNET_PRICE_ID = "0x00000000";        // Zero — no CRO/USD on testnet
 
 async function main() {
-    console.log("🚀 Deploying MoveOnUpgradeable to Cronos Testnet...\n");
+    console.log("Deploying ParadiseUpgradeable to Cronos Testnet...\n");
 
     const [deployer] = await hre.ethers.getSigners();
-    console.log("Deploying with account:", deployer.address);
-    console.log("Chainlink Address:", CHAINLINK_PRICE_FEED);
-    console.log("Pyth Address:", PYTH_ADDRESS);
-    console.log("Band Address:", BAND_ADDRESS);
-    console.log("Pyth Price ID:", PYTH_PRICE_ID);
+    console.log("Deployer:", deployer.address);
 
     const initialBalance = await hre.ethers.provider.getBalance(deployer.address);
-    console.log("Initial balance:", hre.ethers.formatEther(initialBalance), "CRO");
+    console.log("Balance:", hre.ethers.formatEther(initialBalance), "CRO\n");
+
+    // Step 1: Deploy implementation
+    console.log("1. Deploying implementation contract...");
+    const ParadiseUpgradeable = await hre.ethers.getContractFactory("ParadiseUpgradeable");
+    const implementation = await ParadiseUpgradeable.deploy();
+    await implementation.waitForDeployment();
+    const implementationAddress = await implementation.getAddress();
+    console.log("   Implementation:", implementationAddress);
+
+    // Step 2: Deploy TransparentUpgradeableProxy
+    console.log("2. Deploying TransparentUpgradeableProxy...");
+    const TransparentUpgradeableProxy = await hre.ethers.getContractFactory("TransparentUpgradeableProxy");
+    const initData = ParadiseUpgradeable.interface.encodeFunctionData("initialize", [
+        PYTH_ADDRESS,
+        BAND_ADDRESS,
+        PYTH_PRICE_ID,
+        SUPRA_ROUTER,
+        WITNET_ROUTER,
+        WITNET_PRICE_ID
+    ]);
+    const proxy = await TransparentUpgradeableProxy.deploy(implementationAddress, deployer.address, initData);
+    await proxy.waitForDeployment();
+    const proxyAddress = await proxy.getAddress();
+    console.log("   Proxy:", proxyAddress);
+
+    // Step 3: Verify through proxy
+    console.log("\n3. Verifying deployment...");
+    const paradise = ParadiseUpgradeable.attach(proxyAddress);
 
     try {
-        console.log("\nGetting MoveOnUpgradeable contract factory...");
-        const MoveOnUpgradeable = await hre.ethers.getContractFactory("MoveOnUpgradeable");
-
-        console.log("🚀 Deploying implementation contract...");
-        const implementation = await MoveOnUpgradeable.deploy();
-        await implementation.waitForDeployment();
-        const implementationAddress = await implementation.getAddress();
-        console.log("Implementation deployed at:", implementationAddress);
-
-        console.log("🚀 Deploying Transparent Upgradeable Proxy...");
-        const TransparentUpgradeableProxy = await hre.ethers.getContractFactory("TransparentUpgradeableProxy");
-        const initData = MoveOnUpgradeable.interface.encodeFunctionData("initialize", [
-            CHAINLINK_PRICE_FEED,
-            PYTH_ADDRESS,
-            BAND_ADDRESS,
-            PYTH_PRICE_ID
-        ]);
-        const proxy = await TransparentUpgradeableProxy.deploy(implementationAddress, deployer.address, initData);
-        await proxy.waitForDeployment();
-        const proxyAddress = await proxy.getAddress();
-        console.log("Proxy deployed at:", proxyAddress);
-
-        const finalBalance = await hre.ethers.provider.getBalance(deployer.address);
-        console.log("Final balance:", hre.ethers.formatEther(finalBalance), "CRO");
-
-        // Verify contract functionality through proxy
-        console.log("\n🔍 Verifying price feed functionality...");
-        const moveOnProxy = MoveOnUpgradeable.attach(proxyAddress);
-
-        // Get current CRO price from multi-source
-        const croPrice = await moveOnProxy.getCroUsdPrice();
-        console.log("Current CRO/USD price (Multi-source):", (Number(croPrice) / 1e8).toFixed(4));
-
-        const regFee = await moveOnProxy.getRegistrationFeeCro();
-        console.log("Registration fee:", hre.ethers.formatEther(regFee), "CRO");
-
-        console.log("\n🎉 CRONOS TESTNET DEPLOYMENT SUCCESSFUL!");
-        console.log("Proxy Address:", proxyAddress);
-
-        return { implementation, proxy, moveOnProxy };
-
-    } catch (error) {
-        console.error("❌ Deployment failed:", error.message);
-        throw error;
+        const owner = await paradise.owner();
+        console.log("   Owner:", owner);
+        console.log("   Owner matches deployer:", owner.toLowerCase() === deployer.address.toLowerCase());
+    } catch (e) {
+        console.log("   Owner check failed:", e.message);
     }
+
+    try {
+        const totalUsers = await paradise.getTotalUsers();
+        console.log("   Total users:", totalUsers.toString());
+    } catch (e) {
+        console.log("   Total users check failed:", e.message);
+    }
+
+    try {
+        const croPrice = await paradise.getCroUsdPrice();
+        console.log("   CRO/USD Price:", (Number(croPrice) / 1e8).toFixed(4));
+    } catch (e) {
+        console.log("   Price feed failed (expected on testnet):", e.message?.slice(0, 80));
+        console.log("   Setting manual fallback price...");
+        try {
+            const tx = await paradise.setManualCroUsdPrice(5000000); // $0.05
+            await tx.wait();
+            const price = await paradise.getCroUsdPrice();
+            console.log("   Manual price set:", (Number(price) / 1e8).toFixed(4));
+        } catch (e2) {
+            console.log("   Manual price set failed:", e2.message?.slice(0, 80));
+        }
+    }
+
+    try {
+        const regFee = await paradise.getRegistrationFeeCro();
+        console.log("   Registration fee:", hre.ethers.formatEther(regFee), "CRO");
+    } catch (e) {
+        console.log("   Registration fee check failed:", e.message?.slice(0, 80));
+    }
+
+    const finalBalance = await hre.ethers.provider.getBalance(deployer.address);
+    const gasUsed = initialBalance - finalBalance;
+    console.log("\n--- Deployment Summary ---");
+    console.log("Implementation:", implementationAddress);
+    console.log("Proxy:", proxyAddress);
+    console.log("Gas spent:", hre.ethers.formatEther(gasUsed), "CRO");
+    console.log("Explorer: https://testnet.cronoscan.com/address/" + proxyAddress);
+    console.log("\nUpdate frontend config.ts with this proxy address.");
 }
 
 main()
     .then(() => process.exit(0))
     .catch((error) => {
-        console.error(error);
+        console.error("Deployment failed:", error.message);
         process.exit(1);
     });

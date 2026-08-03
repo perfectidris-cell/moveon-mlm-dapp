@@ -1,358 +1,353 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ethers } from 'ethers';
 import { useWeb3 } from '../contexts/Web3Context';
-import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-    AlertTriangle,
-    RefreshCw,
-    Users
-} from 'lucide-react';
-import StatsGrid from '../components/Dashboard/StatsGrid';
-import ActionGrid from '../components/Dashboard/ActionGrid';
-import LevelTable from '../components/Dashboard/LevelTable';
-import NetworkSummary from '../components/Dashboard/NetworkSummary';
-import { useDashboardData } from '../hooks/useDashboardData';
+import { useContract } from '../hooks/useContract';
+import StatCard from '../components/StatCard';
+import LevelTable from '../components/LevelTable';
+import ReferralTree from '../components/ReferralTree';
+import type { UserInfo, UserFinancialInfo } from '../types';
 
-const Dashboard: React.FC = () => {
-    const { account, contract, connectWallet } = useWeb3();
-    const navigate = useNavigate();
-    const { userData, loading, error, isRefreshing, refreshData } = useDashboardData();
+export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'dashboard' | 'downline' | 'admin') => void }) {
+  const { address, isConnected } = useWeb3();
+  const contract = useContract();
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [financials, setFinancials] = useState<UserFinancialInfo | null>(null);
+  const [isOwner, setIsOwner] = useState(false);
+  const [downline, setDownline] = useState<string[]>([]);
+  const [downlineTruncated, setDownlineTruncated] = useState(false);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [upgradeLoading, setUpgradeLoading] = useState<number | null>(null);
+  const [levelCosts, setLevelCosts] = useState<Record<number, string>>({});
+  const [pendingWithdrawal, setPendingWithdrawal] = useState('0');
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
+  const [walletUpgradeLoading, setWalletUpgradeLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    // Action handling states during mutations
-    const [isUpgrading, setIsUpgrading] = useState(false);
-    const [isWithdrawing, setIsWithdrawing] = useState(false);
-    const [nextLevelCost, setNextLevelCost] = useState<string | null>(null);
-    const [canQuickUpgrade, setCanQuickUpgrade] = useState(false);
-    const [isCheckingInactive, setIsCheckingInactive] = useState(false);
-    const [levelCosts, setLevelCosts] = useState<string[]>([]);
+  const loadData = useCallback(async () => {
+    if (!isConnected || !address) return;
+    setLoading(true); setError('');
+    try {
+      const batchCheck = await contract.getUserInfosBatch([address]);
+      if (!batchCheck[0] || batchCheck[0].id === '0x0000000000000000000000000000000000000000') {
+        setError('This wallet is not registered in the Paradise system.');
+        setLoading(false);
+        return;
+      }
 
-    // Fetch upgrade cost and check balance
-    useEffect(() => {
-        const fetchUpgradeInfo = async () => {
-            if (!userData || !contract.contract) {
-                setNextLevelCost(null);
-                setCanQuickUpgrade(false);
-                setLevelCosts([]);
-                return;
-            }
+      setUserInfo(batchCheck[0]);
 
-            try {
-                // Fetch all level costs
-                const costs: string[] = [];
-                for (let i = 1; i <= 12; i++) {
-                    try {
-                        const cost = await contract.getLevelUpgradeCostCro(i);
-                        costs[i] = cost;
-                    } catch {
-                        costs[i] = '0';
-                    }
-                }
-                setLevelCosts(costs);
+      const [fin, sysInfo, pendBal, down] = await Promise.all([
+        contract.getUserFinancialInfo(address).catch(() => null),
+        contract.getSystemInfoCached().catch(() => null),
+        contract.getPendingWithdrawal(address).catch(() => '0'),
+        contract.getDownline(address, 3).catch(() => [] as string[]),
+      ]);
 
-                if (userData.level >= 12) {
-                    setNextLevelCost(null);
-                    setCanQuickUpgrade(false);
-                    return;
-                }
-
-                const nextLevel = userData.level + 1;
-                const cost = costs[nextLevel];
-                setNextLevelCost(cost);
-
-                const totalWithdrawable = parseFloat(userData.totalWithdrawableBalance);
-                const totalReserved = parseFloat(userData.totalReservedBalance);
-                const costValue = parseFloat(cost);
-                setCanQuickUpgrade((totalWithdrawable + totalReserved) >= costValue);
-            } catch (err) {
-                console.error('Error fetching upgrade info:', err);
-                setNextLevelCost(null);
-                setCanQuickUpgrade(false);
-                setLevelCosts([]);
-            }
-        };
-
-        fetchUpgradeInfo();
-    }, [userData, contract]);
-
-    const handleQuickUpgrade = async () => {
-        if (!userData || !contract.contract) return;
-
-        try {
-            setIsUpgrading(true);
-            const nextLevel = userData.level + 1;
-            const cost = await contract.getLevelUpgradeCostCro(nextLevel);
-            console.log('Quick upgrade - Next level:', nextLevel, 'Cost:', cost, 'Total withdrawable:', userData.totalWithdrawableBalance);
-            await contract.quickUpgrade(nextLevel);
-            await refreshData();
-        } catch (err: unknown) {
-            console.error('Quick upgrade failed:', err);
-            alert(err instanceof Error ? err.message : 'Failed to upgrade');
-        } finally {
-            setIsUpgrading(false);
-        }
-    };
-
-    const handleWalletUpgrade = async (level: number) => {
-        if (!contract.contract) return;
-        try {
-            setIsUpgrading(true);
-            const cost = await contract.getLevelUpgradeCostCro(level);
-            console.log('Wallet upgrade - Level:', level, 'Cost:', cost);
-            await contract.walletUpgrade(level, cost);
-            await refreshData();
-        } catch (err: any) {
-            console.error('Wallet upgrade failed:', err);
-            alert(err.message || 'Failed to upgrade');
-        } finally {
-            setIsUpgrading(false);
-        }
-    };
-
-    const handleReactivate = async () => {
-        if (!contract.contract) return;
-        try {
-            setIsUpgrading(true); // Re-using isUpgrading for reactivation
-            const fee = await contract.getRegistrationFeeCro();
-            await contract.reactivateAccount(fee);
-            await refreshData();
-        } catch (err: any) {
-            alert(err.message || 'Failed to reactivate');
-        } finally {
-            setIsUpgrading(false);
-        }
-    };
-
-    const handleWithdrawFromLevel = async (level: number, amount: string) => {
-        if (!contract.contract) return;
-        try {
-            setIsWithdrawing(true);
-            await contract.withdrawFromLevel(level, amount);
-            await refreshData();
-        } catch (err: any) {
-            alert(err.message || 'Failed to withdraw');
-        } finally {
-            setIsWithdrawing(false);
-        }
-    };
-
-    const handleWithdrawAll = async () => {
-        if (!contract.contract || !account) return;
-        try {
-            setIsWithdrawing(true);
-            console.log('UI totalWithdrawableBalance:', userData?.totalWithdrawableBalance);
-            const contractBalance = await contract.contract.getTotalWithdrawableBalance(account);
-            console.log('Contract totalWithdrawableBalance (raw):', contractBalance.toString());
-            console.log('Contract totalWithdrawableBalance (formatted):', ethers.formatEther(contractBalance));
-            await contract.withdrawAllWithdrawable();
-            await refreshData();
-        } catch (err: any) {
-            console.error('Withdraw all error:', err);
-            alert(err.message || 'Failed to withdraw all');
-        } finally {
-            setIsWithdrawing(false);
-        }
-    };
-
-    const handleCheckInactiveUsers = async () => {
-        if (!contract.contract) return;
-        try {
-            setIsCheckingInactive(true);
-            await contract.checkInactiveUsers();
-            alert('Inactive users have been checked and marked as expired if applicable.');
-            await refreshData();
-        } catch (err: any) {
-            alert(err.message || 'Failed to check inactive users');
-        } finally {
-            setIsCheckingInactive(false);
-        }
-    };
-
-    if (!account) {
-        return (
-            <div className="min-h-screen relative font-inter flex items-center justify-center p-4 bg-[#0a0a0f]">
-                <div className="aurora-bg"></div>
-                <div className="glass-panel rounded-3xl p-8 md:p-12 max-w-md w-full text-center border border-white/10 shadow-[0_0_50px_rgba(176,38,255,0.2)]">
-                    <h2 className="text-2xl md:text-3xl font-outfit font-bold text-white mb-6">Connect Your Wallet</h2>
-                    <p className="text-gray-400 mb-8 text-sm md:text-base">Please connect your wallet to access your dashboard</p>
-                    <button
-                        onClick={connectWallet}
-                        className="w-full px-8 py-4 bg-linear-to-r from-neon-purple to-cyber-pink text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg transform hover:scale-105"
-                    >
-                        Connect Wallet
-                    </button>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="mt-6 text-gray-500 hover:text-white transition-colors text-sm"
-                    >
-                        Back to Home
-                    </button>
-                </div>
-            </div>
-        );
+      if (fin) setFinancials(fin);
+      if (sysInfo) {
+        setTotalUsers(sysInfo.totalUsers);
+        setLevelCosts(sysInfo.levelCosts);
+      }
+      setPendingWithdrawal(pendBal);
+      setDownline(down);
+      setDownlineTruncated(down.length >= 2000);
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to load data');
+    } finally {
+      setLoading(false);
     }
+  }, [isConnected, address, contract]);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen font-inter flex items-center justify-center bg-[#0a0a0f]">
-                <div className="flex flex-col items-center">
-                    <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-neon-purple/30 border-t-neon-purple rounded-full animate-spin mb-4"></div>
-                    <div className="text-white text-lg md:text-xl font-outfit animate-pulse">Loading data...</div>
-                </div>
-            </div>
-        );
+  useEffect(() => { loadData(); }, [loadData]);
+
+  useEffect(() => {
+    if (!isConnected || !address) { setIsOwner(false); return; }
+    contract.getOwner().then((own) => {
+      setIsOwner(own.toLowerCase() === address.toLowerCase());
+    }).catch(() => setIsOwner(false));
+  }, [isConnected, address, contract]);
+
+  const handleUpgrade = async (level: number) => {
+    const cost = levelCosts[level];
+    if (!cost) { setError('Level cost not loaded. Try refreshing.'); return; }
+    setUpgradeLoading(level); setError('');
+    try {
+      await contract.walletUpgrade(cost);
+      await loadData();
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Upgrade failed');
+    } finally {
+      setUpgradeLoading(null);
     }
+  };
 
-    if (error) {
-        return (
-            <div className="min-h-screen relative font-inter flex items-center justify-center p-4 bg-[#0a0a0f]">
-                <div className="aurora-bg"></div>
-                <div className="glass-panel rounded-3xl p-8 md:p-12 max-w-md w-full text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold text-red-500 mb-4">Connection Error</h2>
-                    <p className="text-gray-300 mb-8 text-sm">{error}</p>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all"
-                    >
-                        Return Home
-                    </button>
-                </div>
-            </div>
-        );
+  const handleUpgradeFromReserve = async () => {
+    setUpgradeLoading(null); setError('');
+    try {
+      await contract.upgradeFromReserve();
+      await loadData();
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Reserve upgrade failed');
+    } finally {
+      setUpgradeLoading(null);
     }
+  };
 
-    if (!userData) {
-        return (
-            <div className="min-h-screen relative font-inter flex items-center justify-center p-4 bg-[#0a0a0f]">
-                <div className="aurora-bg"></div>
-                <div className="glass-panel rounded-3xl p-8 md:p-12 max-w-md w-full text-center border border-white/10">
-                    <AlertTriangle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Not Registered</h2>
-                    <p className="text-gray-400 mb-4 text-sm">Your wallet address is not registered in the system. Please complete the registration process first.</p>
-                    <p className="text-gray-500 text-xs mb-8 font-mono bg-white/5 p-3 rounded">{account}</p>
-                    <button
-                        onClick={() => navigate('/')}
-                        className="w-full px-8 py-4 bg-linear-to-r from-neon-purple to-cyber-pink text-white font-bold rounded-xl hover:opacity-90 transition-all shadow-lg"
-                    >
-                        Go to Registration
-                    </button>
-                    <button
-                        onClick={() => {
-                            // Refresh data in case there's a delay
-                            refreshData();
-                        }}
-                        className="w-full mt-3 px-8 py-2 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition-all"
-                    >
-                        Refresh
-                    </button>
-                </div>
-            </div>
-        );
+  const handleWithdraw = async () => {
+    setWithdrawLoading(true); setError('');
+    try {
+      await contract.withdraw();
+      await loadData();
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Withdraw failed');
+    } finally {
+      setWithdrawLoading(false);
     }
+  };
 
+  const handleWalletUpgradeSubmit = async () => {
+    const nextLevel = userInfo!.level + 1;
+    const cost = levelCosts[nextLevel];
+    if (!cost || parseFloat(cost) <= 0) { setError('Level cost not loaded. Try refreshing.'); return; }
+    setWalletUpgradeLoading(true); setError('');
+    try {
+      await contract.walletUpgrade(cost);
+      await loadData();
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Wallet upgrade failed');
+    } finally {
+      setWalletUpgradeLoading(false);
+    }
+  };
+
+  if (!isConnected) {
     return (
-        <div className="min-h-screen font-inter text-white pb-20 relative bg-[#0a0a0f]">
-            <div className="aurora-bg"></div>
-
-            <Navbar />
-
-            <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
-                <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-4 pt-24">
-                    <div className="flex-1">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-outfit font-bold mb-2">
-                            Dashboard <span className="text-gradient">Overview</span>
-                        </h1>
-                        <p className="text-gray-400 text-sm md:text-base">Welcome back, manage your matrix and earnings.</p>
-                    </div>
-
-                    <div className="flex items-center gap-3 w-full md:w-auto">
-                        {userData.isExpired && (
-                            <div className="px-5 py-2 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 font-bold animate-pulse text-xs md:text-sm flex items-center gap-2">
-                                <AlertTriangle size={16} /> Account Expired
-                            </div>
-                        )}
-                        <button
-                            onClick={handleCheckInactiveUsers}
-                            disabled={isCheckingInactive}
-                            className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all text-gray-400 hover:text-white disabled:opacity-50"
-                            title="Check Inactive Users"
-                        >
-                            <Users size={20} className={isCheckingInactive ? "animate-spin" : ""} />
-                        </button>
-                        <button
-                            onClick={() => refreshData()}
-                            disabled={isRefreshing}
-                            className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all text-gray-400 hover:text-white disabled:opacity-50"
-                            title="Refresh Data"
-                        >
-                            <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
-                        </button>
-                    </div>
-                </header>
-
-                {/* Account Expired Action */}
-                <AnimatePresence>
-                    {userData.isExpired && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="glass-panel p-6 md:p-8 mb-10 md:mb-12 rounded-3xl border border-red-500/30 bg-red-500/5 flex flex-col md:flex-row items-center justify-between gap-6"
-                        >
-                            <div className="text-center md:text-left">
-                                <h2 className="text-xl md:text-2xl font-bold text-red-400 mb-2 flex items-center gap-2">
-                                    <AlertTriangle /> Reactivation Required
-                                </h2>
-                                <p className="text-gray-300 max-w-xl text-xs md:text-sm">
-                                    Your account has been inactive for more than 100 days.
-                                    Reactivate now to resume earning commissions and maintaining your position.
-                                </p>
-                            </div>
-                            <button
-                                onClick={handleReactivate}
-                                disabled={isUpgrading}
-                                className="w-full md:w-auto px-8 py-3.5 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 disabled:opacity-50 transition-all shadow-[0_0_20px_rgba(239,68,68,0.4)] whitespace-nowrap text-sm"
-                            >
-                                {isUpgrading ? 'Processing...' : 'Reactivate Account'}
-                            </button>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                <StatsGrid userData={userData} />
-
-                <ActionGrid
-                    userData={userData}
-                    isWithdrawing={isWithdrawing}
-                    isUpgrading={isUpgrading}
-                    nextLevelCost={nextLevelCost || undefined}
-                    canQuickUpgrade={canQuickUpgrade}
-                    onWithdrawAll={handleWithdrawAll}
-                    onQuickUpgrade={handleQuickUpgrade}
-                    onWalletUpgrade={handleWalletUpgrade}
-                />
-
-                <NetworkSummary userData={userData} />
-
-                <LevelTable
-                    userData={userData}
-                    isWithdrawing={isWithdrawing}
-                    levelCosts={levelCosts}
-                    onWithdrawFromLevel={handleWithdrawFromLevel}
-                />
-
-                {/* Footer Info */}
-                <div className="mt-12 text-center text-gray-500 text-[10px] md:text-xs pb-8">
-                    <p>Contract: <span className="font-mono text-gray-400">{contract.contract?.target?.toString().slice(0, 10)}...</span></p>
-                    <p className="mt-2 text-gray-600">
-                        Last updated: {new Date().toLocaleTimeString()}
-                        {isRefreshing && <span className="ml-2 text-neon-purple animate-pulse">(Updating...)</span>}
-                    </p>
-                </div>
-            </div>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+        <div className="glass rounded-2xl p-6 sm:p-8 text-center max-w-sm">
+          <div className="text-3xl sm:text-4xl mb-4">🔗</div>
+          <h2 className="text-lg sm:text-xl font-bold text-white mb-2">Connect Your Wallet</h2>
+          <p className="text-sm text-slate-400">Connect your wallet to view your dashboard.</p>
         </div>
+      </div>
     );
-};
+  }
 
-export default Dashboard;
+  if (loading) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-slate-400">Loading your data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !userInfo) {
+    const isRegisteredError = error.includes('not registered');
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4">
+        <div className="glass rounded-2xl p-6 sm:p-8 text-center max-w-sm">
+          <div className="text-3xl sm:text-4xl mb-4">{isRegisteredError ? '⚠️' : '🔌'}</div>
+          <h2 className="text-lg sm:text-xl font-bold text-white mb-2">{isRegisteredError ? 'Not Registered' : 'Connection Error'}</h2>
+          <p className="text-sm text-slate-400 mb-4">{error}</p>
+          {isRegisteredError && <p className="text-xs text-slate-500">Register on the home page to get started.</p>}
+        </div>
+      </div>
+    );
+  }
+
+  if (!userInfo) return null;
+  if (!financials) {
+    return (
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
+        <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-amber-400">
+          Financial data unavailable. Some features may be limited. Try refreshing.
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard</h1>
+            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Welcome back, Level {userInfo.level} member</p>
+          </div>
+          {isOwner && onNavigate && (
+            <button onClick={() => onNavigate('admin')} className="btn-primary text-xs sm:text-sm px-4 py-2 whitespace-nowrap">
+              Admin Dashboard
+            </button>
+          )}
+        </div>
+        <StatCard label="Level" value={`${userInfo.level}`} icon="📊" color="from-brand-400 to-brand-600" subtext="of 12" />
+        <StatCard label="Direct Referrals" value={`${userInfo.directReferrals}`} icon="👥" color="from-purple-400 to-purple-600" subtext="recruited" />
+        <StatCard label="Total Earnings" value={`${parseFloat(ethers.formatEther(userInfo.totalEarnings)).toFixed(4)}`} icon="💰" color="from-emerald-400 to-emerald-600" subtext="CRO earned" />
+        <StatCard label="Network Size" value={`${userInfo.totalReferrals}`} icon="🌳" color="from-amber-400 to-amber-600" subtext={`${totalUsers} total users`} />
+      </div>
+    );
+  }
+
+  const referralLink = `?ref=${address}`;
+  const pendingNum = parseFloat(pendingWithdrawal);
+
+  return (
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-8 space-y-4 sm:space-y-8">
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm text-red-400">{error}</div>
+      )}
+
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard</h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Welcome back, Level {userInfo.level} member</p>
+        </div>
+        {isOwner && onNavigate && (
+          <button onClick={() => onNavigate('admin')} className="btn-primary text-xs sm:text-sm px-4 py-2 whitespace-nowrap">
+            Admin Dashboard
+          </button>
+        )}
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3">
+        <StatCard label="Level" value={`${userInfo.level}`} icon="📊" color="from-brand-400 to-brand-600" subtext="of 12" />
+        <StatCard label="Direct Referrals" value={`${userInfo.directReferrals}`} icon="👥" color="from-purple-400 to-purple-600" subtext="recruited" />
+        <StatCard label="Total Earnings" value={`${parseFloat(ethers.formatEther(userInfo.totalEarnings)).toFixed(4)}`} icon="💰" color="from-emerald-400 to-emerald-600" subtext="CRO earned" />
+        <StatCard label="Network Size" value={`${userInfo.totalReferrals}`} icon="🌳" color="from-amber-400 to-amber-600" subtext={`${totalUsers} total users`} />
+        <StatCard label="Pending Withdrawal" value={`${pendingNum.toFixed(4)}`} icon="💳" color="from-cyan-400 to-cyan-600" subtext="CRO available" />
+      </div>
+
+      {/* Withdraw */}
+      <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm sm:text-base font-bold text-white">Withdraw Earnings</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
+              {pendingNum > 0
+                ? `${pendingNum.toFixed(4)} CRO available to withdraw.`
+                : 'No pending withdrawal balance.'}
+            </p>
+          </div>
+          <button
+            onClick={handleWithdraw}
+            disabled={withdrawLoading || pendingNum <= 0}
+            className={`text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl font-semibold transition-all w-full sm:w-auto ${
+              pendingNum > 0
+                ? 'btn-primary'
+                : 'bg-white/5 text-slate-500 cursor-not-allowed'
+            }`}
+          >
+            {withdrawLoading ? 'Processing...' : 'Withdraw All'}
+          </button>
+        </div>
+      </div>
+
+      {/* Reserve Progress */}
+      <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm sm:text-base font-bold text-white">Upgrade via Reserve</h3>
+          <p className="text-[10px] sm:text-xs text-slate-400">50% auto-reserved</p>
+        </div>
+        {userInfo.level >= 12 ? (
+          <p className="text-sm text-emerald-400 text-center py-3 sm:py-4">You are already at max level (12)!</p>
+        ) : (() => {
+          const nextLevel = userInfo.level + 1;
+          const cost = levelCosts[nextLevel];
+          const reservedArr = financials.reservedForUpgrade;
+          const reservedStr = reservedArr && reservedArr.length > nextLevel ? reservedArr[nextLevel] : '0';
+          const reservedNum = parseFloat(ethers.formatEther(reservedStr));
+          const costNum = cost ? parseFloat(cost) : 0;
+          const pct = costNum > 0 ? Math.min((reservedNum / costNum) * 100, 100) : 0;
+          const canUpgrade = costNum > 0 && reservedNum >= costNum;
+          return (
+            <div className="bg-white/3 rounded-xl p-3 sm:p-3 max-w-md">
+              <div className="flex justify-between text-[10px] sm:text-xs mb-1.5">
+                <span className="text-slate-400">Level {nextLevel} Reserve</span>
+                <span className="text-white font-medium">{reservedNum.toFixed(4)} / {costNum.toFixed(4)} CRO</span>
+              </div>
+              <div className="h-1.5 sm:h-2 bg-white/5 rounded-full overflow-hidden mb-2">
+                <div
+                  className={`h-full rounded-full transition-all duration-500 ${canUpgrade ? 'bg-gradient-to-r from-emerald-400 to-emerald-600' : 'bg-gradient-to-r from-brand-400 to-brand-600'}`}
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              <button
+                onClick={handleUpgradeFromReserve}
+                disabled={upgradeLoading === nextLevel || !canUpgrade}
+                className={`w-full text-[10px] sm:text-xs font-medium px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 ${
+                  canUpgrade
+                    ? 'text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20'
+                    : 'text-slate-500 bg-white/5'
+                }`}
+              >
+                {upgradeLoading === nextLevel
+                  ? 'Upgrading...'
+                  : canUpgrade
+                    ? `Upgrade to Level ${nextLevel} (Reserve)`
+                    : 'Insufficient reserve'}
+              </button>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* External Wallet Upgrade */}
+      <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm sm:text-base font-bold text-white">Upgrade via External Wallet</h3>
+          <p className="text-[10px] sm:text-xs text-slate-400">One level at a time</p>
+        </div>
+        {userInfo.level >= 12 ? (
+          <p className="text-sm text-emerald-400 text-center py-3 sm:py-4">You are already at max level (12)!</p>
+        ) : (() => {
+          const nextLevel = userInfo.level + 1;
+          const cost = levelCosts[nextLevel];
+          return (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm text-slate-400 mb-1">
+                  Upgrade to <span className="text-white font-semibold">Level {nextLevel}</span>
+                  {cost ? <span className="text-brand-400 font-mono"> — {parseFloat(cost).toFixed(4)} CRO</span> : null}
+                </p>
+              </div>
+              <button
+                onClick={handleWalletUpgradeSubmit}
+                disabled={walletUpgradeLoading || !cost}
+                className="btn-primary text-xs sm:text-sm px-5 sm:px-6 py-3 whitespace-nowrap disabled:opacity-50 w-full sm:w-auto"
+              >
+                {walletUpgradeLoading ? 'Processing...' : cost ? `Upgrade Lvl ${nextLevel}` : 'Loading cost...'}
+              </button>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* Referral Link */}
+      <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5">
+        <h3 className="text-sm sm:text-base font-bold text-white mb-2">Your Referral Link</h3>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 bg-white/5 rounded-xl px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs text-brand-300 truncate">
+            {window.location.origin}{referralLink}
+          </div>
+          <button
+            onClick={() => navigator.clipboard.writeText(`${window.location.origin}${referralLink}`)}
+            className="btn-secondary text-[10px] sm:text-xs px-3 sm:px-4 py-2 whitespace-nowrap"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+
+      {/* Two Column */}
+      <div className="grid lg:grid-cols-5 gap-4 sm:gap-6">
+        <div className="lg:col-span-3">
+          <LevelTable userLevel={userInfo.level} onUpgrade={handleUpgrade} />
+        </div>
+        <div className="lg:col-span-2">
+          {downlineTruncated && (
+            <p className="text-[10px] text-amber-400/80 mb-2 text-center">Showing up to 2,000 members. Visit full network for complete view.</p>
+          )}
+          <ReferralTree downline={downline} totalReferrals={userInfo.totalReferrals} onViewAll={() => onNavigate?.('downline')} />
+        </div>
+      </div>
+    </div>
+  );
+}
