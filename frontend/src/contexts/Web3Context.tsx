@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { ethers } from 'ethers';
 import { CRONOS_CHAIN_ID, CRONOS_NETWORK } from '../utils/config';
+import { FailoverProvider } from '../utils/failoverProvider';
 
 declare global {
   interface Window {
@@ -40,12 +41,9 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
   const hasRestoredRef = useRef(false);
 
   const readOnlyProvider = useMemo(() => {
-    for (const url of CRONOS_NETWORK.rpcUrls) {
-      try {
-        const p = new ethers.JsonRpcProvider(url, CRONOS_CHAIN_ID, { staticNetwork: true });
-        return p;
-      } catch {}
-    }
+    try {
+      return new FailoverProvider(CRONOS_NETWORK.rpcUrls, CRONOS_CHAIN_ID);
+    } catch {}
     return null;
   }, []);
 
