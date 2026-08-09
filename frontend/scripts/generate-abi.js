@@ -6,8 +6,11 @@
  * Prerequisites: compile the backend contracts first (cd ../backend && npx hardhat compile)
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const ARTIFACT_PATH = path.join(__dirname, '..', '..', 'backend', 'artifacts', 'contracts', 'ParadiseUpgradeable.sol', 'ParadiseUpgradeable.json');
 const OUTPUT_PATH = path.join(__dirname, '..', 'src', 'utils', 'contract-abi.json');
@@ -32,7 +35,7 @@ function main() {
     'getUserAddressesPaginated', 'getUserParentInfo', 'getMatrixChildren',
     'matrixParent', 'findNextSlot', 'pendingWithdrawals', 'paused',
     'getUserDashboard', 'getSystemInfo', 'getReservedBalance',
-    'owner', 'manualCroUsdPrice', 'manualRegistrationFeeCro',
+    'owner', 'manualCroUsdPrice', 'manualRegistrationFeeCro', 'getManualLevelCosts',
     'UserRegistered', 'UserUpgraded', 'PaymentReceived',
   ]);
 

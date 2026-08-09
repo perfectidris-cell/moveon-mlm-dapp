@@ -14,10 +14,8 @@ function shortenAddress(addr: string) {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 }
 
-function isActive(lastActiveTime: number): boolean {
-  if (!lastActiveTime) return false;
-  const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-  return Date.now() - lastActiveTime * 1000 < thirtyDaysMs;
+function isActive(_lastActiveTime: number): boolean {
+  return true;
 }
 
 const LEVEL_STYLES = {

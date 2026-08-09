@@ -22,6 +22,7 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     // Constants
     uint256 public constant MAX_REFERRALS = 2;
     uint256 public constant MAX_LEVELS = 12;
+    uint256 public constant MAX_AUTO_UPGRADES = 12;
 
     uint256 public constant REGISTRATION_FEE_USD = 2e8;
     uint256 public constant MAX_ORACLE_STALENESS = 3600;
@@ -132,6 +133,11 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         require(users[user].id != address(0), "User not registered");
         require(level >= 1 && level <= MAX_LEVELS, "Invalid level");
         users[user].level = level;
+        if (level < MAX_LEVELS) {
+            cachedNextLevelCost[user] = getLevelUpgradeCostCro(level + 1);
+        } else {
+            cachedNextLevelCost[user] = 0;
+        }
     }
 
 
@@ -304,6 +310,11 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         manualRegistrationFeeCro = _regFeeCro;
         manualLevelCostsCro = _levelCostsCro;
         emit ManualPriceSet(manualCroUsdPrice, _regFeeCro);
+    }
+
+    /// @notice Get all manual level costs in one call (admin panel RPC optimization)
+    function getManualLevelCosts() external view returns (uint256[13] memory) {
+        return manualLevelCostsCro;
     }
 
     /// @notice Emergency pause/unpause all payment functions
@@ -506,7 +517,7 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
             require(success, "Refund failed");
         }
 
-        _executeUpgrade(msg.sender, level, upgradeCost);
+        _executeUpgrade(msg.sender, level, upgradeCost, "manual");
     }
 
     // Upgrade from reserved balance (step-by-step only)
@@ -520,11 +531,11 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         require(user.reservedForUpgrade[level] >= upgradeCost, "Insufficient reserve");
 
         user.reservedForUpgrade[level] -= upgradeCost;
-        _executeUpgrade(msg.sender, level, upgradeCost);
+        _executeUpgrade(msg.sender, level, upgradeCost, "manual");
     }
 
     // Internal upgrade execution logic
-    function _executeUpgrade(address userAddress, uint256 level, uint256 cost) internal {
+    function _executeUpgrade(address userAddress, uint256 level, uint256 cost, string memory upgradeType) internal {
         users[userAddress].level = level;
         users[userAddress].lastActiveTime = block.timestamp;
 
@@ -541,7 +552,33 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         _releaseReserves(userAddress, level);
 
         emit ManualUpgrade(userAddress, level, cost);
-        emit UserUpgraded(userAddress, level, "manual");
+        emit UserUpgraded(userAddress, level, upgradeType);
+    }
+
+    /// @notice Auto-upgrade a user when their reserved pot covers the next level cost.
+    ///         Only uses the user's own reserve (never contract-wide balance), never fires
+    ///         when the cost is unknown (0), and is capped by MAX_AUTO_UPGRADES per tx so a
+    ///         payment cascade cannot blow past the gas limit.
+    function _tryAutoUpgrade(address userAddress) internal {
+        User storage user = users[userAddress];
+        if (user.level >= MAX_LEVELS) return;
+        if (autoUpgradeDepth >= MAX_AUTO_UPGRADES) return;
+
+        uint256 nextLevel = user.level + 1;
+        // Use the cached next-level cost (refreshed on every registration/upgrade and
+        // by setUserLevel) so a payment cascade never re-queries price oracles per step.
+        // Fall back to the live getter only when the cache is empty (feeds were down).
+        uint256 upgradeCost = cachedNextLevelCost[userAddress];
+        if (upgradeCost == 0) {
+            upgradeCost = getLevelUpgradeCostCro(nextLevel);
+            if (upgradeCost == 0) return;
+        }
+        if (user.reservedForUpgrade[nextLevel] < upgradeCost) return;
+
+        autoUpgradeDepth++;
+        user.reservedForUpgrade[nextLevel] -= upgradeCost;
+        _executeUpgrade(userAddress, nextLevel, upgradeCost, "auto");
+        autoUpgradeDepth--;
     }
 
 
@@ -596,6 +633,13 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     // Release reserved funds for levels up to the new level
     function _releaseReserves(address userAddress, uint256 newLevel) internal {
         User storage user = users[userAddress];
+
+        // Fast path: reserves only ever accumulate at user.level + 1 (written by
+        // _applySplitWithCap), and every upgrade releases all levels <= newLevel.
+        // So right before a release, the ONLY possibly non-zero reserve is
+        // reservedForUpgrade[newLevel] (leftover that was not consumed by the upgrade).
+        // If that is empty, every lower level is empty too and the loop is pure waste.
+        if (user.reservedForUpgrade[newLevel] == 0) return;
 
         uint256 releasedTotal = 0;
         for (uint256 i = 1; i <= newLevel; i++) {
@@ -735,6 +779,10 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
 
         if (payoutAmount > 0) {
             pendingWithdrawals[userAddress] += payoutAmount;
+        }
+
+        if (user.level < MAX_LEVELS) {
+            _tryAutoUpgrade(userAddress);
         }
     }
 
@@ -1099,5 +1147,7 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     }
 
     /// @dev Reserved storage slots for future upgrades
-    uint256[34] private __gap;
+    uint256 private autoUpgradeDepth;
+
+    uint256[33] private __gap;
 }

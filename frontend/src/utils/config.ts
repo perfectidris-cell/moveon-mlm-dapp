@@ -78,6 +78,7 @@ export const CONTRACT_ABI = [
   { type: 'function', name: 'setReferralCap', inputs: [{ name: '_cap', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' },
   { type: 'function', name: 'setUserLevel', inputs: [{ name: 'user', type: 'address' }, { name: 'level', type: 'uint256' }], outputs: [], stateMutability: 'nonpayable' },
   { type: 'function', name: 'manualLevelCostsCro', inputs: [{ name: '', type: 'uint256' }], outputs: [{ name: '', type: 'uint256' }], stateMutability: 'view' },
+  { type: 'function', name: 'getManualLevelCosts', inputs: [], outputs: [{ name: '', type: 'uint256[13]' }], stateMutability: 'view' },
   { type: 'function', name: 'referralCap', inputs: [], outputs: [{ name: '', type: 'uint256' }], stateMutability: 'view' },
   { type: 'function', name: 'togglePause', inputs: [], outputs: [], stateMutability: 'nonpayable' },
   { type: 'function', name: 'paused', inputs: [], outputs: [{ name: '', type: 'bool' }], stateMutability: 'view' },

@@ -24,11 +24,11 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
   const [walletUpgradeLoading, setWalletUpgradeLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (force = false) => {
     if (!isConnected || !address) return;
     setLoading(true); setError('');
     try {
-      const batchCheck = await contract.getUserInfosBatch([address]);
+      const batchCheck = await contract.getUserInfosBatch([address], force);
       if (!batchCheck[0] || batchCheck[0].id === '0x0000000000000000000000000000000000000000') {
         setError('This wallet is not registered in the Paradise system.');
         setLoading(false);
@@ -37,19 +37,20 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
 
       setUserInfo(batchCheck[0]);
 
-      const [fin, sysInfo, pendBal, down] = await Promise.all([
-        contract.getUserFinancialInfo(address).catch(() => null),
+      const [fin, sysInfo, down] = await Promise.all([
+        contract.getUserFinancialInfo(address, force).catch(() => null),
         contract.getSystemInfoCached().catch(() => null),
-        contract.getPendingWithdrawal(address).catch(() => '0'),
-        contract.getDownline(address, 3).catch(() => [] as string[]),
+        contract.getDownline(address, 3, force).catch(() => [] as string[]),
       ]);
 
-      if (fin) setFinancials(fin);
+      if (fin) {
+        setFinancials(fin);
+        setPendingWithdrawal(fin.totalWithdrawableBalance ?? '0');
+      }
       if (sysInfo) {
         setTotalUsers(sysInfo.totalUsers);
         setLevelCosts(sysInfo.levelCosts);
       }
-      setPendingWithdrawal(pendBal);
       setDownline(down);
       setDownlineTruncated(down.length >= 2000);
     } catch (err: any) {
@@ -74,7 +75,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
     setUpgradeLoading(level); setError('');
     try {
       await contract.walletUpgrade(cost);
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Upgrade failed');
     } finally {
@@ -86,7 +87,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
     setUpgradeLoading(null); setError('');
     try {
       await contract.upgradeFromReserve();
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Reserve upgrade failed');
     } finally {
@@ -98,7 +99,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
     setWithdrawLoading(true); setError('');
     try {
       await contract.withdraw();
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Withdraw failed');
     } finally {
@@ -113,7 +114,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
     setWalletUpgradeLoading(true); setError('');
     try {
       await contract.walletUpgrade(cost);
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Wallet upgrade failed');
     } finally {
