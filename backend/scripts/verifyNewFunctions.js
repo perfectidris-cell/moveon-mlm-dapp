@@ -10,11 +10,11 @@ async function main() {
   const parentInfo = await c.getUserParentInfo(deployer.address);
   console.log("getUserParentInfo owner -> referrer:", parentInfo.referrer, "level:", Number(parentInfo.referrerLevel));
   
-  const downline = await c.getDownline(deployer.address, 5);
-  console.log("getDownline(owner, 5) size:", downline.length);
-  for (let i = 0; i < downline.length; i++) {
-    const info = await c.getUserInfo(downline[i]);
-    console.log("  [" + i + "]", downline[i], "level:", Number(info.level));
+  const downline = await c.getDownlinePaginated(deployer.address, 5, 0, 200);
+  console.log("getDownlinePaginated(owner, 5) size:", downline.members.length, "total:", Number(downline.total));
+  for (let i = 0; i < downline.members.length; i++) {
+    const info = await c.getUserInfo(downline.members[i]);
+    console.log("  [" + i + "]", downline.members[i], "level:", Number(info.level));
   }
   
   const r = await c.getDownlinePaginated(deployer.address, 5, 0, 2);

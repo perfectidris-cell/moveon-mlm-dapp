@@ -80,8 +80,8 @@ async function main() {
 
     // Test aggregate views
     console.log("\nTesting aggregate views:");
-    const dashboard = await paradiseProxy.getUserDashboard(deployer.address);
-    console.log("getUserDashboard level:", dashboard.level.toString());
+    const dashInfo = await paradiseProxy.getUserInfo(deployer.address);
+    console.log("getUserInfo level:", dashInfo.level.toString());
 
     const sysInfo = await paradiseProxy.getSystemInfo();
     console.log("getSystemInfo users:", sysInfo.totalUsers.toString());

@@ -27,16 +27,21 @@ function main() {
 
   // Filter to only the functions/events used by the frontend
   const KEEP = new Set([
-    'register', 'walletUpgrade', 'upgradeFromReserve', 'withdraw', 'togglePause',
-    'getUserInfo', 'getUserFinancialInfo', 'getUserInfosBatch', 'getUserFinancialInfosBatch',
+    'register', 'registerAuto', 'findNextSlotAndProof', 'walletUpgrade', 'upgradeFromReserve',
+    'withdraw', 'claimMissedEarnings', 'getTotalMissedEarnings', 'togglePause',
+    'getUserInfo', 'getUserFinancialInfo', 'getUserInfosBatch',
     'getRegistrationFeeCro', 'getLevelUpgradeCostCro', 'getLevelCostsCroBatch',
     'getTotalUsers', 'getTotalReservedBalance', 'getTotalWithdrawableBalance',
-    'getCroUsdPrice', 'getDownline', 'getDownlinePaginated', 'getDownlineUpTo62',
+    'getCroUsdPrice', 'getDownlinePaginated',
     'getUserAddressesPaginated', 'getUserParentInfo', 'getMatrixChildren',
     'matrixParent', 'findNextSlot', 'pendingWithdrawals', 'paused',
-    'getUserDashboard', 'getSystemInfo', 'getReservedBalance',
+    'uplineCache', 'uplinesBackfilled', 'backfillUplinesBatch', 'emergencyBalances',
+    'getSystemInfo', 'getReservedBalance',
     'owner', 'manualCroUsdPrice', 'manualRegistrationFeeCro', 'getManualLevelCosts',
-    'UserRegistered', 'UserUpgraded', 'PaymentReceived',
+    'totalDownline', 'downlineBackfilled', 'backfillDownlineBatch', 'getDownlineBackfillCount',
+    'settlementCredited', 'creditMigratedReserves', 'ReserveCredited',
+    'UserRegistered', 'UserUpgraded', 'PaymentReceived', 'DownlineBackfilled',
+    'PayoutSent', 'PayoutDeferred', 'depositReserves', 'ReservesDeposited',
   ]);
 
   const filtered = abi.filter(item => KEEP.has(item.name));

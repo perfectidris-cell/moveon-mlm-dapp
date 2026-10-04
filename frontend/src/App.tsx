@@ -20,6 +20,7 @@ export default function App() {
           {page === 'dashboard' && <Dashboard onNavigate={setPage} />}
           {page === 'downline' && <DownlinePage />}
           {page === 'admin' && <AdminPage />}
+          {!['home', 'dashboard', 'downline', 'admin'].includes(page) && <HomePage onNavigate={setPage} />}
         </div>
       </Web3Provider>
     </ErrorBoundary>

@@ -100,21 +100,31 @@ describe("ParadiseUpgradeable - Automatic Upgrade", function () {
     await expect(paradise.connect(user1).upgradeFromReserve()).to.be.revertedWith("Insufficient reserve");
   });
 
-  it("Never auto-upgrades for free and never reverts when price feeds are unavailable (cost 0)", async function () {
+  it("Blocks zero-cost registrations and upgrades when price feeds are unavailable (SEC-02)", async function () {
     paradiseNoFeeds = await deployProxy(ethers.ZeroAddress);
     expect(await paradiseNoFeeds.getRegistrationFeeCro()).to.equal(0);
     expect(await paradiseNoFeeds.getLevelUpgradeCostCro(2)).to.equal(0);
 
-    // register works with a 0 fee; fill the owner bonus slot first so user1 stays level 1
-    await paradiseNoFeeds.connect(user3).register(deployer.address, deployer.address, [deployer.address], { value: 0 });
-    await paradiseNoFeeds.connect(user1).register(deployer.address, user3.address, [user3.address, deployer.address], { value: 0 });
+    // SEC-02: registration reverts when price feed is offline (cost 0) to prevent free accounts
+    await expect(
+      paradiseNoFeeds.connect(user3).register(deployer.address, deployer.address, [deployer.address], { value: 0 })
+    ).to.be.revertedWith("Price feed offline");
 
-    // registering a child triggers a payment flow with 0 cost -> no free upgrade, no revert
-    await paradiseNoFeeds.connect(user2).register(user1.address, user1.address, [user1.address], { value: 0 });
+    // Setting manual price fallback restores functionality safely
+    const manualPrice = ethers.parseUnits("0.08", 8); // $0.08 CRO
+    await paradiseNoFeeds.setManualCroUsdPrice(manualPrice);
+    const fee = await paradiseNoFeeds.getRegistrationFeeCro();
+    expect(fee).to.be.gt(0);
+
+    // Register with valid manual price; fill owner slot first
+    await paradiseNoFeeds.connect(user3).register(deployer.address, deployer.address, [deployer.address], { value: fee });
+    await paradiseNoFeeds.connect(user1).register(deployer.address, user3.address, [user3.address, deployer.address], { value: fee });
+
+    // Registering child triggers payment flow with cost > 0 -> user1 stays level 1
+    await paradiseNoFeeds.connect(user2).register(user1.address, user1.address, [user1.address], { value: fee });
 
     const info = await paradiseNoFeeds.getUserInfo(user1.address);
     expect(info.level).to.equal(1);
-    expect(await paradiseNoFeeds.getReservedBalance(user1.address, 2)).to.equal(0);
   });
 
   it("Caps auto-upgrade cascade depth at MAX_AUTO_UPGRADES", async function () {

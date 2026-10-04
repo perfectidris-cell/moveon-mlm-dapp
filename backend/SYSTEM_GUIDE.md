@@ -1,6 +1,7 @@
 # Paradise System - Complete User Guide
 
 ## Table of Contents
+
 1. [System Overview](#system-overview)
 2. [How to Register](#how-to-register)
 3. [Level System & Costs](#level-system--costs)
@@ -16,7 +17,8 @@
 
 **Paradise** is a decentralized MLM (Multi-Level Marketing) system built on the Cronos blockchain. It allows users to build a passive income network by recruiting team members and upgrading through 12 levels.
 
-### Key Features:
+### Key Features
+
 - **12-Level System**: Progress from Level 1 (Registration) to Level 12 (Master)
 - **Binary Structure**: Each user can have a maximum of 2 direct referrals
 - **Unlimited Depth**: Your downline can grow indefinitely
@@ -24,7 +26,8 @@
 - **Auto-Upgrades**: Your account automatically levels up when you've earned enough
 - **Multi-Source Price Feeds**: Costs are in USD but paid in CRO, with real-time conversion
 
-### System Benefits:
+### System Benefits
+
 - Earn commissions from your direct recruits
 - Earn commissions from their recruits (unlimited depth)
 - Automatic account upgrades based on earnings
@@ -34,34 +37,40 @@
 
 ## How to Register
 
-### Step-by-Step Registration Process:
+### Step-by-Step Registration Process
 
 **Step 1: Connect Your Wallet**
+
 - Click "Connect Wallet" on the homepage
 - Approve the connection in your web3 wallet (MetaMask, Trust Wallet, etc.)
 - Ensure you're on the Cronos network
 
 **Step 2: Get Your Referral Link**
+
 - Once connected, you can invite others using your personal referral link
 - Your referral link format: `https://paradise.com/?ref=YOUR_WALLET_ADDRESS`
 - Share this with people you want to recruit
 
 **Step 3: Enter Referrer Address**
+
 - If someone invited you, enter their wallet address in the "Referrer Address" field
 - The system will validate that they are registered
 - You cannot register without a valid referrer (except for the first users)
 
 **Step 4: Check Registration Fee**
+
 - Registration fee is currently $2 USD (approximately shown in CRO)
 - The exact CRO amount fluctuates based on the CRO/USD exchange rate
 - You'll see the fee displayed before confirming
 
 **Step 5: Confirm and Pay**
+
 - Approve the transaction in your wallet
 - Wait for blockchain confirmation (usually 5-30 seconds)
 - Once confirmed, you're registered at Level 1!
 
 **What Happens After Registration:**
+
 - Your $2 registration fee is split: 50% paid immediately to your referrer, 50% goes to their reserve for Level 2 upgrade
 - Your referrer can now earn more by recruiting (up to 2 direct recruits)
 - You can now recruit others and start earning
@@ -73,10 +82,10 @@
 
 Paradise has 12 levels. Each level requires progressively higher payments to unlock.
 
-### Complete Level Breakdown:
+### Complete Level Breakdown
 
 | Level | USD Cost | Description | Max Annual Earnings | Unlock Requirements |
-|-------|----------|-------------|-------------------|-------------------|
+| ----- | -------- | ----------- | ------------------- | ------------------- |
 | **1** | $2 | Entry Level | Unlimited | Registration |
 | **2** | $2 | First Upgrade | Unlimited | Pay $2 |
 | **3** | $4 | | Unlimited | Level 2 + $4 |
@@ -90,7 +99,8 @@ Paradise has 12 levels. Each level requires progressively higher payments to unl
 | **11** | $1,024 | Elite | Unlimited | Level 10 + $1,024 |
 | **12** | $2,048 | Founder | Unlimited | Level 11 + $2,048 |
 
-### Pricing Model:
+### Pricing Model
+
 - **Exponential Growth**: Each level costs 2x the previous (except Level 2 = Level 1)
 - **Total Investment for Level 12**: Approximately $4,086 USD
 - **CRO Conversion**: All costs are paid in CRO (Cronos token), converted from USD in real-time
@@ -105,32 +115,41 @@ Paradise has 12 levels. Each level requires progressively higher payments to unl
 
 You earn money in three ways:
 
-### 1. **Direct Referral Commissions**
+### 1. Direct Referral Commissions
+
 When someone you recruited purchases or upgrades, you earn a commission:
+
 - **Your recruit joins (Level 1)**: You get $2 payment split 50/50 (explained below)
 - **Your recruit upgrades (Level 2-12)**: You get that level's cost as payment
 
 **Example:**
+
 - You recruit Alice at $2 → You get $1 immediate + $1 in reserve
 - Alice upgrades to Level 5 ($16) → You get $8 immediate + $8 in reserve
 
-### 2. **Unlimited Downline Earnings**
+### 2. Unlimited Downline Earnings
+
 You earn from everyone in your organization, not just direct recruits:
+
 - Your direct recruits earn from their recruits
 - You earn a commission from those earnings if you have the right level
 - Earnings flow upward through the structure
 
 **Example:**
+
 - You at Level 5 can earn from Level 5 purchases by anyone in your downline
 - Your Level 5 recruit brings in $16 payment → You get a commission
 
-### 3. **Auto-Upgrade Bonuses**
+### 3. Auto-Upgrade Bonuses
+
 When your account auto-upgrades (explained below), payment cascades trigger:
+
 - Each auto-upgrade processes a payment for the new level
 - This triggers commissions for your uplines
 - Creates momentum in your earning potential
 
-### Total Earning Potential:
+### Total Earning Potential
+
 - **Passive Income**: Once you recruit 2 people who recruit 2 people each, you start earning passively
 - **Geometric Growth**: With spillover mechanism, one organization can grow exponentially
 - **Unlimited Depth**: No cap on how many levels below you can earn from
@@ -143,7 +162,7 @@ When your account auto-upgrades (explained below), payment cascades trigger:
 
 **Every payment you receive is split into two parts:**
 
-```
+```text
 Payment Received
     ↓
     ├─ 50% → Goes to Reserve (locked for next level upgrade)
@@ -151,6 +170,7 @@ Payment Received
 ```
 
 **Example:**
+
 - You receive a $100 payment
 - $50 automatically reserves toward your next level cost
 - $50 is paid to your wallet immediately
@@ -158,11 +178,13 @@ Payment Received
 ### Reserve System
 
 **What is Reserve?**
+
 - A locked balance building toward your next level upgrade cost
 - Grows automatically as you earn
 - Cannot be withdrawn manually (only auto-upgrades release it)
 
 **How Reserves Work:**
+
 - Level 7 cost = $64
 - You start earning → First $32 goes to reserve
 - More earnings come → Next $32 goes to reserve
@@ -171,7 +193,8 @@ Payment Received
 - You jump to Level 8, reserve clears, Level 8 payment processes
 
 **Example Flow:**
-```
+
+```text
 You at Level 7 receive 4 payments of $50 each:
 
 1st Payment ($50): Reserve = $25, Payout = $25
@@ -187,16 +210,23 @@ You at Level 7 receive 4 payments of $50 each:
 ### Qualified vs Unqualified Payments
 
 **When You ARE Qualified (You have the right level):**
+
 - Upline member recruits at your level → You get 100% of that payment
 - 50/50 split applied to the full amount
 - Direct commission to you
 
 **When You are NOT Qualified (You're below that level):**
-- Payment goes to next qualified upline in your chain
-- If no one qualified in your chain → Distributed 10% to each of 8 uplines + 20% to owner
+
+- Payment goes to the next qualified upline in your chain (searched up to 12 levels)
+- If no qualified upline exists in the 12-level search → Payment routes to the contract reserve/protocol treasury (owner) to support system liquidity
 - You still benefit from auto-upgrades when you reach qualification level
 
+**Platform Maintenance Contribution (Levels 4–12):**
+
+- For higher tiers (Levels 4 through 12), on every 3rd commission payment received by a user, a 2% platform contribution is allocated to the protocol treasury/contract owner to fund liquidity reserves, ongoing oracle infrastructure, and platform maintenance. The member receives 98% of that payment.
+
 **Example:**
+
 - You're Level 3, your upline is Level 5
 - Someone in your downline buys Level 4 ($8)
 - You're unqualified (need Level 4) → Payment goes to your Level 5 upline
@@ -209,12 +239,13 @@ You at Level 7 receive 4 payments of $50 each:
 ### The Binary + Spillover System
 
 **Basic Structure:**
+
 - Each person can recruit **maximum 2 direct people**
 - Those 2 can each recruit 2 more (creating 4 people)
 - Each of those 4 can recruit 2 more (creating 8 people)
 - **Unlimited depth**: This continues infinitely
 
-```
+```text
 You (Level 7)
 ├─ Direct 1: Alice (Level 3)
 │  ├─ Alice's 1: Bob (Level 1)
@@ -238,7 +269,7 @@ You recruit 3 people, but you can only have 2 direct.
 
 **With Spillover:** 3rd person automatically places under one of your direct recruits who has room
 
-```
+```text
 BEFORE: You try to recruit person C
 You
 ├─ Direct 1: Alice (2/2 spots FULL)
@@ -252,6 +283,7 @@ You
 ```
 
 **Key Benefits:**
+
 - Your organization grows even if your 2 direct slots are full
 - Recruits aren't rejected
 - Automatically finds the next available position
@@ -260,13 +292,15 @@ You
 ### Payment Flow Through Structure
 
 **Level-Based Payment Routing:**
+
 - Level 1 payment → Goes to your 1st upline
 - Level 2 payment → Goes to your 2nd upline
 - Level 5 payment → Goes to your 5th upline
 - Continues up the chain
 
 **Example Chain:**
-```
+
+```text
 You (Level 7 purchase = $64)
     ↓
 1st Upline: Alice (Level 6) - She's NOT qualified for Level 7
@@ -285,6 +319,7 @@ You (Level 7 purchase = $64)
 The system continuously monitors your earnings and **automatically upgrades you** when you've earned enough for the next level.
 
 **The Process:**
+
 1. You receive a payment → 50% goes to reserve for next level
 2. System checks: Is your reserve ≥ next level cost?
 3. If **YES**: Auto-upgrade triggers!
@@ -295,7 +330,8 @@ The system continuously monitors your earnings and **automatically upgrades you*
    - You start earning for the new level
 
 **Example Auto-Upgrade Chain:**
-```
+
+```text
 You at Level 3, trying to reach Level 12
 
 Step 1: Recruit brings $4 (Level 3 cost)
@@ -321,12 +357,14 @@ Step 4: Recruit upgrades to Level 6 ($32)
 ### Cascading Auto-Upgrades
 
 Multiple auto-upgrades can happen in sequence:
+
 - Level 3 auto-upgrades to Level 4
 - Level 4 triggers upgrade to Level 5
 - Level 5 immediately upgrades to Level 6
 - Creates a "cascade effect"
 
 **The Advantage:**
+
 - Fast progression without manual payments
 - Momentum builds as your team grows
 - Less cost to reach high levels

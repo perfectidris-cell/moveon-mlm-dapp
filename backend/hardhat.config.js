@@ -4,22 +4,33 @@ const { extendEnvironment } = require("hardhat/config");
 
 const accounts = process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [];
 
+// Ordered by measured health (2026-08-14): private/authenticated relays first,
+// canonical public infra next, then rate-limited free tiers last.
 const CRONOS_RPC_URLS = [
     "https://evm-cronos.crypto.org",
-    "https://cronos-mainnet.core.chainstack.com/f594d625c3a2c07704bed1beb4cae56b",
-    "https://lb.drpc.live/cronos/AqLS9pjM8kSphmpdDl70ykuFqbiRhesR8aqKwosiOHdW",
     "https://cronos.drpc.org/",
-    "https://cronos.org/rpc",
-    "https://rpc.swiftnodes.io/rpc/cronos?key=demo",
-    "https://cro-mainnet.gateway.tatum.io"
+    "https://evm.cronos.org/",
+    "https://cro-mainnet.gateway.tatum.io",
+    "https://rpc.swiftnodes.io/rpc/cronos?key=demo"
 ];
 
+const RPC_TIMEOUT_MS = 6000;
+
 async function rpcRequest(url, method, params) {
-    const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params })
-    });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), RPC_TIMEOUT_MS);
+    let res;
+    try {
+        res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+            signal: controller.signal
+        });
+    } finally {
+        clearTimeout(timer);
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
     return data.result;

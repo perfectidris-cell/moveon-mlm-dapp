@@ -79,14 +79,14 @@ describe("ParadiseUpgradeable - subtreeSlots & findNextSlot", function () {
     expect(await paradise.findNextSlot(owner.address)).to.equal(user1.address);
   });
 
-  it("findNextSlot returns deeper leaf when parents are full", async function () {
+  it("findNextSlot balances tree by filling sibling when left child is full", async function () {
     await paradise.connect(user1).register(owner.address, owner.address, pathFor(owner.address), { value: regFee });
     await paradise.connect(user2).register(owner.address, owner.address, pathFor(owner.address), { value: regFee });
     await paradise.connect(user3).register(user1.address, user1.address, pathFor(user1.address), { value: regFee });
     await paradise.connect(user4).register(user1.address, user1.address, pathFor(user1.address), { value: regFee });
 
-    // Owner full → user1 full → user3 (0 kids, has room) → return user3
-    expect(await paradise.findNextSlot(owner.address)).to.equal(user3.address);
+    // Owner full → user1 full (2 kids) → user2 has room (0 kids) → returns user2
+    expect(await paradise.findNextSlot(owner.address)).to.equal(user2.address);
   });
 
   it("findNextSlot with different root returns correct slot for sub-tree", async function () {
@@ -124,47 +124,36 @@ describe("ParadiseUpgradeable - subtreeSlots & findNextSlot", function () {
     expect(await paradise.subtreeSlots(owner.address)).to.equal(7);
   });
 
-  it("End-to-end: findNextSlot guides placement and subtreeSlots stay consistent", async function () {
+  it("End-to-end: findNextSlot guides balanced placement across both branches", async function () {
     // Simulate frontend flow: findNextSlot → buildPathProof → register
-    // Path proof follows the referrer chain: placement → ... → referrer
     async function registerAtNextSlot(user, referrer) {
       const placement = await paradise.findNextSlot(referrer.address);
       expect(placement).to.not.equal(ethers.ZeroAddress);
 
-      // Build path proof along the referrer chain from placement up to referrer
+      // Build path proof along matrixParent from placement up to referrer
       const path = [placement];
       let cur = placement;
       while (cur !== referrer.address) {
-        const userInfo = await paradise.users(cur);
-        cur = userInfo.referrer;
+        cur = await paradise.matrixParent(cur);
         path.push(cur);
       }
       await paradise.connect(user).register(referrer.address, placement, path, { value: regFee });
     }
 
-    // Register 6 users — all refer to owner, placement guided by findNextSlot
-    await registerAtNextSlot(user1, owner); // under owner
-    await registerAtNextSlot(user2, owner); // under owner → owner full
-    await registerAtNextSlot(user3, owner); // under user1
-    await registerAtNextSlot(user4, owner); // under user1 → user1 full
-    await registerAtNextSlot(user5, owner); // under user3
-    await registerAtNextSlot(user6, owner); // under user3 → user3 full
+    // Register 6 users — all refer to owner, placement balanced by findNextSlot
+    await registerAtNextSlot(user1, owner); // under owner (owner has [user1])
+    await registerAtNextSlot(user2, owner); // under owner (owner has [user1, user2] -> full!)
+    await registerAtNextSlot(user3, owner); // under user1 (user1 has [user3])
+    await registerAtNextSlot(user4, owner); // under user2 (user2 has [user4]) -> balanced across branches!
+    await registerAtNextSlot(user5, owner); // under user1 (user1 has [user3, user5] -> full!)
+    await registerAtNextSlot(user6, owner); // under user2 (user2 has [user4, user6] -> full!)
 
-    // findNextSlot walks left-deep: owner → user1 → user3 → user5 (leaf)
-    expect(await paradise.findNextSlot(owner.address)).to.equal(user5.address);
+    // Both user1 and user2 are now full (2 kids each). Next slot descends into user1's first child user3:
+    expect(await paradise.findNextSlot(owner.address)).to.equal(user3.address);
 
-    // subtreeSlots consistency: each registration adds 1 to all ancestors
-    // owner: 2 initial + 6 registrations = 8
-    expect(await paradise.subtreeSlots(owner.address)).to.equal(8);
-    // user1: 2 + 2 (user3, user4) + 2 (ancestor of user5, user6) = 6
-    expect(await paradise.subtreeSlots(user1.address)).to.equal(6);
-    // user2: 2 + 0 (no kids) = 2
-    expect(await paradise.subtreeSlots(user2.address)).to.equal(2);
-    // user3: 2 + 2 (user5, user6) = 4
-    expect(await paradise.subtreeSlots(user3.address)).to.equal(4);
-    // leaves: 2
-    expect(await paradise.subtreeSlots(user4.address)).to.equal(2);
-    expect(await paradise.subtreeSlots(user5.address)).to.equal(2);
-    expect(await paradise.subtreeSlots(user6.address)).to.equal(2);
+    // Verify balanced distribution
+    expect(await paradise.totalDownline(user1.address)).to.equal(2);
+    expect(await paradise.totalDownline(user2.address)).to.equal(2);
+    expect(await paradise.totalDownline(owner.address)).to.equal(6);
   });
 });

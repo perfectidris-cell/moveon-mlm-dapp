@@ -6,6 +6,7 @@ import StatCard from '../components/StatCard';
 import LevelTable from '../components/LevelTable';
 import ReferralTree from '../components/ReferralTree';
 import type { UserInfo, UserFinancialInfo } from '../types';
+import { getPlanetName } from '../utils/planetLevels';
 
 export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'dashboard' | 'downline' | 'admin') => void }) {
   const { address, isConnected } = useWeb3();
@@ -13,13 +14,12 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [financials, setFinancials] = useState<UserFinancialInfo | null>(null);
   const [isOwner, setIsOwner] = useState(false);
-  const [downline, setDownline] = useState<string[]>([]);
-  const [downlineTruncated, setDownlineTruncated] = useState(false);
   const [totalUsers, setTotalUsers] = useState(0);
   const [loading, setLoading] = useState(true);
   const [upgradeLoading, setUpgradeLoading] = useState<number | null>(null);
   const [levelCosts, setLevelCosts] = useState<Record<number, string>>({});
   const [pendingWithdrawal, setPendingWithdrawal] = useState('0');
+  const [networkSize, setNetworkSize] = useState(0);
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [walletUpgradeLoading, setWalletUpgradeLoading] = useState(false);
   const [error, setError] = useState('');
@@ -28,31 +28,70 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
     if (!isConnected || !address) return;
     setLoading(true); setError('');
     try {
+      // Frontend-wide optimization: prefer single Multicall batch (1 RPC vs 4) when available
+      const batchFn = (contract as any).getDashboardBatch as undefined | ((addr: string, force?: boolean) => Promise<any>);
+      if (batchFn) {
+        try {
+          const b = await batchFn(address, force);
+          if (!b?.userInfo || b.userInfo.id === '0x0000000000000000000000000000000000000000') {
+            // fallback to single check if batch missed
+            const single = await contract.getUserInfosBatch([address], force);
+            if (!single[0] || single[0].id === '0x0000000000000000000000000000000000000000') {
+              setError('This wallet is not registered in the Paradise system.');
+              setLoading(false);
+              return;
+            }
+            setUserInfo(single[0]);
+          } else {
+            setUserInfo(b.userInfo);
+          }
+          if (b?.financial) {
+            setFinancials(b.financial);
+          } else {
+            const fin = await contract.getUserFinancialInfo(address, force).catch(() => null);
+            if (fin) { setFinancials(fin); }
+          }
+          // Escape-hatch balance: failed-push commissions + legacy pending (1 RPC)
+          const missed = await (contract as any).getTotalMissedEarnings(address).catch(() => '0');
+          setPendingWithdrawal(missed);
+          if (b?.systemInfo) {
+            setTotalUsers(b.systemInfo.totalUsers);
+            setLevelCosts(b.systemInfo.levelCosts);
+          } else {
+            const sysInfo = await contract.getSystemInfoCached().catch(() => null);
+            if (sysInfo) { setTotalUsers(sysInfo.totalUsers); setLevelCosts(sysInfo.levelCosts); }
+          }
+          setNetworkSize(b?.totalDownline ?? 0);
+          return;
+        } catch {
+          // fall through to legacy path
+        }
+      }
       const batchCheck = await contract.getUserInfosBatch([address], force);
       if (!batchCheck[0] || batchCheck[0].id === '0x0000000000000000000000000000000000000000') {
         setError('This wallet is not registered in the Paradise system.');
         setLoading(false);
         return;
       }
-
       setUserInfo(batchCheck[0]);
-
-      const [fin, sysInfo, down] = await Promise.all([
+      const [fin, sysInfo, downlineCount] = await Promise.all([
         contract.getUserFinancialInfo(address, force).catch(() => null),
         contract.getSystemInfoCached().catch(() => null),
-        contract.getDownline(address, 3, force).catch(() => [] as string[]),
+        contract
+          .getTotalDownline(address)
+          .catch(() => contract.getDownlinePaginated(address, 20, 0, 1).then((r) => r.total))
+          .catch(() => 0),
       ]);
-
       if (fin) {
         setFinancials(fin);
-        setPendingWithdrawal(fin.totalWithdrawableBalance ?? '0');
       }
+      const missed = await (contract as any).getTotalMissedEarnings(address).catch(() => '0');
+      setPendingWithdrawal(missed);
       if (sysInfo) {
         setTotalUsers(sysInfo.totalUsers);
         setLevelCosts(sysInfo.levelCosts);
       }
-      setDownline(down);
-      setDownlineTruncated(down.length >= 2000);
+      setNetworkSize(downlineCount);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to load data');
     } finally {
@@ -98,10 +137,11 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
   const handleWithdraw = async () => {
     setWithdrawLoading(true); setError('');
     try {
-      await contract.withdraw();
+      // Escape hatch: pulls failed-push commissions (+ legacy pending) in one tx
+      await (contract as any).claimMissedEarnings();
       await loadData(true);
     } catch (err: any) {
-      setError(err?.reason || err?.message?.slice(0, 100) || 'Withdraw failed');
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Claim failed');
     } finally {
       setWithdrawLoading(false);
     }
@@ -169,7 +209,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard</h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Welcome back, Level {userInfo.level} member</p>
+            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Welcome back, Level {userInfo.level} · {getPlanetName(userInfo.level)} member</p>
           </div>
           {isOwner && onNavigate && (
             <button onClick={() => onNavigate('admin')} className="btn-primary text-xs sm:text-sm px-4 py-2 whitespace-nowrap">
@@ -177,15 +217,15 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
             </button>
           )}
         </div>
-        <StatCard label="Level" value={`${userInfo.level}`} icon="📊" color="from-brand-400 to-brand-600" subtext="of 12" />
+        <StatCard label="Level" value={`${userInfo.level}`} icon="🪐" color="from-brand-400 to-brand-600" subtext={getPlanetName(userInfo.level)} />
         <StatCard label="Direct Referrals" value={`${userInfo.directReferrals}`} icon="👥" color="from-purple-400 to-purple-600" subtext="recruited" />
         <StatCard label="Total Earnings" value={`${parseFloat(ethers.formatEther(userInfo.totalEarnings)).toFixed(4)}`} icon="💰" color="from-emerald-400 to-emerald-600" subtext="CRO earned" />
-        <StatCard label="Network Size" value={`${userInfo.totalReferrals}`} icon="🌳" color="from-amber-400 to-amber-600" subtext={`${totalUsers} total users`} />
+        <StatCard label="Network Size" value={`${networkSize}`} icon="🌳" color="from-amber-400 to-amber-600" subtext={isOwner ? `${totalUsers} total users` : 'members in your network'} />
       </div>
     );
   }
 
-  const referralLink = `?ref=${address}`;
+  const referralLink = `${window.location.origin}${window.location.pathname}?ref=${address}`;
   const pendingNum = parseFloat(pendingWithdrawal);
 
   return (
@@ -198,7 +238,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard</h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Welcome back, Level {userInfo.level} member</p>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Welcome back, Level {userInfo.level} · {getPlanetName(userInfo.level)} member</p>
         </div>
         {isOwner && onNavigate && (
           <button onClick={() => onNavigate('admin')} className="btn-primary text-xs sm:text-sm px-4 py-2 whitespace-nowrap">
@@ -212,32 +252,29 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
         <StatCard label="Level" value={`${userInfo.level}`} icon="📊" color="from-brand-400 to-brand-600" subtext="of 12" />
         <StatCard label="Direct Referrals" value={`${userInfo.directReferrals}`} icon="👥" color="from-purple-400 to-purple-600" subtext="recruited" />
         <StatCard label="Total Earnings" value={`${parseFloat(ethers.formatEther(userInfo.totalEarnings)).toFixed(4)}`} icon="💰" color="from-emerald-400 to-emerald-600" subtext="CRO earned" />
-        <StatCard label="Network Size" value={`${userInfo.totalReferrals}`} icon="🌳" color="from-amber-400 to-amber-600" subtext={`${totalUsers} total users`} />
-        <StatCard label="Pending Withdrawal" value={`${pendingNum.toFixed(4)}`} icon="💳" color="from-cyan-400 to-cyan-600" subtext="CRO available" />
+        <StatCard label="Network Size" value={`${networkSize}`} icon="🌳" color="from-amber-400 to-amber-600" subtext={isOwner ? `${totalUsers} total users` : 'members in your network'} />
+        <StatCard label="Deferred Balance" value={`${pendingNum.toFixed(4)}`} icon="💳" color="from-cyan-400 to-cyan-600" subtext="CRO awaiting claim" />
       </div>
 
-      {/* Withdraw */}
+      {/* Direct Payouts */}
       <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm sm:text-base font-bold text-white">Withdraw Earnings</h3>
+            <h3 className="text-sm sm:text-base font-bold text-white">Direct Payouts</h3>
             <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-              {pendingNum > 0
-                ? `${pendingNum.toFixed(4)} CRO available to withdraw.`
-                : 'No pending withdrawal balance.'}
+              Your earnings are sent automatically to your wallet — no manual withdrawal needed.
+              {pendingNum > 0 && ` ${pendingNum.toFixed(4)} CRO is awaiting claim below.`}
             </p>
           </div>
-          <button
-            onClick={handleWithdraw}
-            disabled={withdrawLoading || pendingNum <= 0}
-            className={`text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl font-semibold transition-all w-full sm:w-auto ${
-              pendingNum > 0
-                ? 'btn-primary'
-                : 'bg-white/5 text-slate-500 cursor-not-allowed'
-            }`}
-          >
-            {withdrawLoading ? 'Processing...' : 'Withdraw All'}
-          </button>
+          {pendingNum > 0 && (
+            <button
+              onClick={handleWithdraw}
+              disabled={withdrawLoading}
+              className="btn-secondary text-xs sm:text-sm px-5 sm:px-6 py-2.5 rounded-xl font-semibold transition-all w-full sm:w-auto"
+            >
+              {withdrawLoading ? 'Processing...' : 'Claim Missed Earnings'}
+            </button>
+          )}
         </div>
       </div>
 
@@ -326,10 +363,10 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
         <h3 className="text-sm sm:text-base font-bold text-white mb-2">Your Referral Link</h3>
         <div className="flex items-center gap-2">
           <div className="flex-1 bg-white/5 rounded-xl px-3 sm:px-4 py-2 font-mono text-[10px] sm:text-xs text-brand-300 truncate">
-            {window.location.origin}{referralLink}
+            {referralLink}
           </div>
           <button
-            onClick={() => navigator.clipboard.writeText(`${window.location.origin}${referralLink}`)}
+            onClick={() => navigator.clipboard.writeText(referralLink)}
             className="btn-secondary text-[10px] sm:text-xs px-3 sm:px-4 py-2 whitespace-nowrap"
           >
             Copy
@@ -343,10 +380,7 @@ export default function Dashboard({ onNavigate }: { onNavigate?: (p: 'home' | 'd
           <LevelTable userLevel={userInfo.level} onUpgrade={handleUpgrade} />
         </div>
         <div className="lg:col-span-2">
-          {downlineTruncated && (
-            <p className="text-[10px] text-amber-400/80 mb-2 text-center">Showing up to 2,000 members. Visit full network for complete view.</p>
-          )}
-          <ReferralTree downline={downline} totalReferrals={userInfo.totalReferrals} onViewAll={() => onNavigate?.('downline')} />
+          <ReferralTree totalReferrals={networkSize} onViewAll={() => onNavigate?.('downline')} />
         </div>
       </div>
     </div>

@@ -41,67 +41,57 @@ export default function AdminPage() {
   const [migrationInfo, setMigrationInfo] = useState({ total: 0, migrated: 0 });
   const [migrationRunning, setMigrationRunning] = useState(false);
   const [migrationProgress, setMigrationProgress] = useState('');
+  const [backfillRunning, setBackfillRunning] = useState(false);
+  const [backfillProgress, setBackfillProgress] = useState('');
 
-  const loadData = useCallback(async () => {
+  // Settlement state
+  const [backfillCount, setBackfillCount] = useState(0);
+  const [settlementRunning, setSettlementRunning] = useState(false);
+  const [settlementProgress, setSettlementProgress] = useState('');
+  const [settlementLedger, setSettlementLedger] = useState<null | { recipients: number; credited: number }>(null);
+
+  const loadData = useCallback(async (force = false) => {
     if (!isConnected || !address) return;
     setLoading(true); setError(''); setSuccess('');
 
     try {
-      const [own, p, sysInfo] = await Promise.all([
-        contract.getOwner().catch(() => ''),
-        contract.getPaused().catch(() => false),
-        contract.getSystemInfoCached().catch(() => null),
+      const [cfg, bal] = await Promise.all([
+        contract.getAdminConfigCached(force).catch(() => null),
+        provider ? provider.getBalance(address).then(b => ethers.formatEther(b)).catch(() => '0') : Promise.resolve('0'),
       ]);
 
+      if (!cfg) {
+        setError('Failed to load admin data');
+        setLoading(false);
+        return;
+      }
+
+      const own = cfg.owner;
       setOwner(own);
       setIsOwner(own.toLowerCase() === address.toLowerCase());
-      setPaused(p);
-
-      if (sysInfo) {
-        setTotalUsers(sysInfo.totalUsers);
-        setCroPrice(sysInfo.croPrice);
-        setRegFee(sysInfo.regFee);
-        setLevelCosts(sysInfo.levelCosts);
-      }
-
-      // Migration info
-      if (own.toLowerCase() === address.toLowerCase()) {
-        const [migrated, tot] = await Promise.all([
-          contract.getMigratedCount().catch(() => 0),
-          contract.getTotalUsers().catch(() => 0),
-        ]);
-        setMigrationInfo({ total: tot, migrated });
-      }
+      setPaused(cfg.paused);
+      setTotalUsers(cfg.totalUsers);
+      setCroPrice(cfg.croPrice);
+      setRegFee(cfg.regFee);
+      setLevelCosts(cfg.levelCosts);
+      setOwnerBalance(bal || '0');
 
       if (own.toLowerCase() === address.toLowerCase()) {
-        const [mPrice, mRegFee, mReferralCap, mCosts, pyth, band, pythPriceId, supra, witnet, witnetPriceId, bal] = await Promise.all([
-          contract.getManualCroUsdPrice().catch(() => '0'),
-          contract.getManualRegistrationFeeCro().catch(() => '0'),
-          contract.getReferralCap().catch(() => 0),
-          contract.getManualLevelCostsBatch().catch(() => Array(13).fill('0')),
-          contract.getPythAddress().catch(() => ''),
-          contract.getBandAddress().catch(() => ''),
-          contract.getPythPriceId().catch(() => ''),
-          contract.getSupraRouter().catch(() => ''),
-          contract.getWitnetRouter().catch(() => ''),
-          contract.getWitnetPriceId().catch(() => ''),
-          provider ? provider.getBalance(own).then(b => ethers.formatEther(b)).catch(() => '0') : Promise.resolve('0'),
-        ]);
+        setMigrationInfo({ total: cfg.totalUsers, migrated: cfg.migrated });
+        setBackfillCount(cfg.backfilled);
 
-        setOwnerBalance(bal || '0');
-
-        const orc = { pyth, band, pythPriceId, supra, witnet, witnetPriceId };
+        const orc = { pyth: cfg.pyth, band: cfg.band, pythPriceId: cfg.pythPriceId, supra: cfg.supraRouter, witnet: cfg.witnetRouter, witnetPriceId: cfg.witnetPriceId };
         setOracles(orc);
         setOracleForm(orc);
 
-        setManualCroUsdPrice(mPrice);
-        setManualRegFee(mRegFee);
-        _setManualLevelCosts(mCosts);
-        setReferralCap(mReferralCap);
-        setManualPriceInput(mPrice === '0' ? '' : mPrice);
-        setManualRegFeeInput(mRegFee === '0' ? '' : mRegFee);
-        setManualLevelCostsInput(mCosts.map(c => c === '0' ? '' : c));
-        setReferralCapInput(mReferralCap.toString());
+        setManualCroUsdPrice(cfg.manualCroUsdPrice);
+        setManualRegFee(cfg.manualRegFee);
+        _setManualLevelCosts(cfg.manualLevelCosts);
+        setReferralCap(cfg.referralCap);
+        setManualPriceInput(cfg.manualCroUsdPrice === '0' ? '' : cfg.manualCroUsdPrice);
+        setManualRegFeeInput(cfg.manualRegFee === '0' ? '' : cfg.manualRegFee);
+        setManualLevelCostsInput(cfg.manualLevelCosts.map(c => c === '0' ? '' : c));
+        setReferralCapInput(cfg.referralCap.toString());
       }
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to load admin data');
@@ -120,7 +110,7 @@ export default function AdminPage() {
     try {
       await contract.setManualCroUsdPrice(manualPriceInput);
       setSuccess(`Manual CRO/USD price set to ${manualPriceInput}`);
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to set price');
     } finally {
@@ -139,7 +129,7 @@ export default function AdminPage() {
     try {
       await contract.setManualCroCosts(manualRegFeeInput, costs);
       setSuccess('Manual registration fee and level costs updated');
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to set costs');
     } finally {
@@ -152,7 +142,7 @@ export default function AdminPage() {
     try {
       await contract.togglePause();
       setSuccess(paused ? 'Contract unpaused' : 'Contract paused');
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Toggle pause failed');
     } finally {
@@ -169,7 +159,7 @@ export default function AdminPage() {
     try {
       await contract.setReferralCap(cap);
       setSuccess(`Referral cap set to ${cap}`);
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to set referral cap');
     } finally {
@@ -189,11 +179,41 @@ export default function AdminPage() {
     try {
       await contract.setUserLevel(userLevelAddress, lvl);
       setSuccess(`User ${userLevelAddress.slice(0, 6)}...${userLevelAddress.slice(-4)} set to Level ${lvl}`);
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to set user level');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleRunSettlement = async () => {
+    setSettlementRunning(true); setError(''); setSuccess(''); setSettlementProgress('');
+    try {
+      const response = await fetch('/settlement_ledger.json');
+      if (!response.ok) throw new Error('Ledger not found — place settlement_ledger.json in /public');
+      const data = await response.json();
+      const rows: { address: string; shareWei: string }[] = data.rows ?? [];
+      if (!Array.isArray(rows) || rows.length === 0) throw new Error('Ledger is empty');
+
+      const BATCH_SIZE = 40;
+      let credited = 0;
+      for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+        const batch = rows.slice(i, i + BATCH_SIZE);
+        const users = batch.map((r) => r.address);
+        const amounts = batch.map((r) => BigInt(r.shareWei));
+        setSettlementProgress(`Crediting batch ${i / BATCH_SIZE + 1} (${i + batch.length}/${rows.length})...`);
+        await contract.creditMigratedReserves(users, amounts);
+        credited += batch.length;
+        setSettlementLedger((prev) => prev ? { ...prev, credited } : { recipients: rows.length, credited });
+      }
+      setSuccess(`Settlement complete! ${credited}/${rows.length} users credited.`);
+      await loadData(true);
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 120) || 'Settlement failed');
+    } finally {
+      setSettlementRunning(false);
+      setSettlementProgress('');
     }
   };
 
@@ -206,11 +226,13 @@ export default function AdminPage() {
     // Find first un-migrated index
     try {
       if (migrated > 0) {
-        for (let i = 0; i < migrationInfo.total; i++) {
-          const addrs = await contract.getUserAddressesPaginated(i, 1);
+        const SCAN_BATCH = 50;
+        for (let start = 0; start < migrationInfo.total; start += SCAN_BATCH) {
+          const addrs = await contract.getUserAddressesPaginated(start, SCAN_BATCH);
           if (addrs.length === 0) break;
-          const done = await contract.getIsMigrated(addrs[0]);
-          if (!done) { startIndex = i; break; }
+          const doneFlags = await contract.getIsMigratedBatch(addrs);
+          const firstUnmigrated = doneFlags.findIndex((d) => !d);
+          if (firstUnmigrated !== -1) { startIndex = start + firstUnmigrated; break; }
         }
       }
 
@@ -231,6 +253,51 @@ export default function AdminPage() {
     }
   };
 
+  const handleRunBackfill = async () => {
+    setBackfillRunning(true); setError(''); setSuccess(''); setBackfillProgress('');
+    const BATCH_SIZE = 30;
+    const SCAN_BATCH = 50;
+    let backfilled = backfillCount;
+    let startIndex = migrationInfo.total;
+
+    // Find highest un-backfilled index. Process from END downward so children are
+    // tallied before parents (required for correct totalDownline).
+    try {
+      for (let start = 0; start < migrationInfo.total; start += SCAN_BATCH) {
+        const addrs = await contract.getUserAddressesPaginated(start, SCAN_BATCH);
+        if (addrs.length === 0) break;
+        const flags = await contract.getIsDownlineBackfilledBatch(addrs);
+        for (let i = flags.length - 1; i >= 0; i--) {
+          if (!flags[i]) { startIndex = Math.max(startIndex, start + i); break; }
+        }
+      }
+
+      if (startIndex >= migrationInfo.total) {
+        setSuccess(`Downline already fully backfilled (${backfilled}/${migrationInfo.total}).`);
+        setBackfillRunning(false);
+        setBackfillProgress('');
+        return;
+      }
+
+      while (startIndex >= 0) {
+        setBackfillProgress(`Backfilling downline at index ${startIndex}...`);
+        const batchStart = Math.max(0, startIndex - (BATCH_SIZE - 1));
+        await contract.backfillDownlineBatch(batchStart, BATCH_SIZE);
+        backfilled = await contract.getDownlineBackfillCount();
+        setBackfillCount(backfilled);
+        if (backfilled >= migrationInfo.total) break;
+        startIndex = batchStart - 1;
+      }
+
+      setSuccess(`Downline backfill complete! ${backfilled}/${migrationInfo.total} users.`);
+    } catch (err: any) {
+      setError(err?.reason || err?.message?.slice(0, 100) || 'Backfill failed');
+    } finally {
+      setBackfillRunning(false);
+      setBackfillProgress('');
+    }
+  };
+
   const handleUpdateOracles = async () => {
     setActionLoading('oracles'); setError(''); setSuccess('');
     try {
@@ -239,7 +306,7 @@ export default function AdminPage() {
         oracleForm.supra, oracleForm.witnet, oracleForm.witnetPriceId
       );
       setSuccess('Oracle configuration updated');
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to update oracles');
     } finally {
@@ -252,7 +319,7 @@ export default function AdminPage() {
     try {
       await contract.setPriceFeeds(oracleForm.pyth, oracleForm.band, oracleForm.pythPriceId);
       setSuccess('Pyth/Band price feeds updated');
-      await loadData();
+      await loadData(true);
     } catch (err: any) {
       setError(err?.reason || err?.message?.slice(0, 100) || 'Failed to update price feeds');
     } finally {
@@ -325,7 +392,7 @@ export default function AdminPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-white">Admin Dashboard</h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-0.5">Contract owner panel — {address?.slice(0, 6)}...{address?.slice(-4)}</p>
         </div>
-        <button onClick={loadData} className="btn-secondary text-xs sm:text-sm px-4 py-2 flex items-center gap-2 self-start">
+        <button onClick={() => loadData(true)} className="btn-secondary text-xs sm:text-sm px-4 py-2 flex items-center gap-2 self-start">
           <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.992 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
           </svg>
@@ -588,7 +655,10 @@ export default function AdminPage() {
                 style={{ width: `${migrationInfo.total > 0 ? (migrationInfo.migrated / migrationInfo.total) * 100 : 0}%` }}
               />
             </div>
-            <p className="text-[10px] text-slate-500">{migrationProgress}</p>
+            <div className="flex justify-between text-[10px] text-slate-500">
+              <span>Downline backfilled: {backfillCount}</span>
+            </div>
+            <p className="text-[10px] text-slate-500">{migrationProgress || backfillProgress}</p>
             <button
               onClick={handleRunMigration}
               disabled={migrationRunning || migrationInfo.migrated >= migrationInfo.total}
@@ -599,6 +669,44 @@ export default function AdminPage() {
                 : migrationInfo.migrated >= migrationInfo.total && migrationInfo.total > 0
                   ? 'All Users Migrated ✅'
                   : 'Run Migration'}
+            </button>
+            <button
+              onClick={handleRunBackfill}
+              disabled={backfillRunning || backfillCount >= migrationInfo.total}
+              className="btn-primary text-xs sm:text-sm px-4 py-2.5 w-full disabled:opacity-50"
+            >
+              {backfillRunning
+                ? 'Backfilling...'
+                : backfillCount >= migrationInfo.total && migrationInfo.total > 0
+                  ? 'Downline Backfilled ✅'
+                  : 'Backfill Downline'}
+            </button>
+          </div>
+        </div>
+
+        {/* Migrated Reserves Settlement */}
+        <div className="glass rounded-xl sm:rounded-2xl p-4 sm:p-5 space-y-3">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold text-white">Migrated Reserves Settlement</h3>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">
+              One-time credit: restores reserved upgrade balances lost in the first migration. Idempotent batches
+              of 40 users from a public ledger.
+            </p>
+          </div>
+          <div className="space-y-2">
+            {settlementLedger && (
+              <div className="flex justify-between text-xs text-slate-400">
+                <span>Credited: {settlementLedger.credited} / {settlementLedger.recipients}</span>
+                <span>{settlementLedger.recipients > 0 ? `${Math.round((settlementLedger.credited / settlementLedger.recipients) * 100)}%` : '—'}</span>
+              </div>
+            )}
+            <p className="text-[10px] text-slate-500">{settlementProgress}</p>
+            <button
+              onClick={handleRunSettlement}
+              disabled={settlementRunning}
+              className="btn-primary text-xs sm:text-sm px-4 py-2.5 w-full disabled:opacity-50"
+            >
+              {settlementRunning ? 'Crediting...' : 'Run Settlement'}
             </button>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useWeb3 } from '../contexts/Web3Context';
 import { useContract } from '../hooks/useContract';
+import { getPlanetName } from '../utils/planetLevels';
 
 function shortenAddress(addr: string) {
   return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
@@ -22,7 +23,7 @@ function getLevelStyle(level: number) {
   return LEVEL_STYLES[0];
 }
 
-export default function ReferralTree({ downline: _downline, totalReferrals, onViewAll }: { downline: string[]; totalReferrals: number; onViewAll?: () => void }) {
+export default function ReferralTree({ totalReferrals, onViewAll }: { totalReferrals: number; onViewAll?: () => void }) {
   const { address } = useWeb3();
   const contract = useContract();
   const [children, setChildren] = useState<string[]>([]);
@@ -31,26 +32,23 @@ export default function ReferralTree({ downline: _downline, totalReferrals, onVi
   useEffect(() => {
     if (!address) return;
 
-    contract.getMatrixChildren(address)
-      .then((kids) => {
+    contract.getChildrenWithUserInfoBatch([address])
+      .then((res) => {
+        const kids = res.childrenByParent[0] || [];
         setChildren(kids);
-        if (kids.length > 0) {
-          contract.getUserInfosBatch(kids)
-            .then((infos) => {
-              const nextLevels: Record<string, number> = {};
-              for (let i = 0; i < kids.length; i += 1) {
-                if (infos[i] && infos[i].id !== '0x0000000000000000000000000000000000000000') {
-                  nextLevels[kids[i].toLowerCase()] = infos[i].level;
-                }
-              }
-              setLevels(nextLevels);
-            })
-            .catch(() => setLevels({}));
-        } else {
-          setLevels({});
+        const nextLevels: Record<string, number> = {};
+        for (const child of kids) {
+          const info = res.infoByAddr.get(child.toLowerCase());
+          if (info && info.id !== '0x0000000000000000000000000000000000000000') {
+            nextLevels[child.toLowerCase()] = info.level;
+          }
         }
+        setLevels(nextLevels);
       })
-      .catch(() => setChildren([]));
+      .catch(() => {
+        setChildren([]);
+        setLevels({});
+      });
   }, [address, contract]);
 
   const directCount = children.length;
@@ -107,10 +105,10 @@ export default function ReferralTree({ downline: _downline, totalReferrals, onVi
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-mono text-xs text-white">{shortenAddress(child)}</div>
-                  <div className="text-[11px] text-slate-400">Level {level}</div>
+                  <div className="text-[11px] text-slate-400 truncate">{level ? `${getPlanetName(level)} · Lv ${level}` : '—'}</div>
                 </div>
-                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${getLevelStyle(level)}`}>
-                  L{level}
+                <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold truncate max-w-[84px] ${getLevelStyle(level)}`} title={level ? getPlanetName(level) : ''}>
+                  {level ? getPlanetName(level) : '?'}
                 </span>
               </div>
             );

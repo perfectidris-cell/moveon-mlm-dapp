@@ -44,9 +44,9 @@ async function main() {
   console.log("\n3. Verifying new features...");
 
   // Get user dashboard
-  const dashboard = await proxy.getUserDashboard(deployer.address);
-  console.log("   getUserDashboard level:", dashboard.level.toString());
-  console.log("   getUserDashboard directReferrals:", dashboard.directReferrals.toString());
+  const dashboard = await proxy.getUserInfo(deployer.address);
+  console.log("   getUserInfo level:", dashboard.level.toString());
+  console.log("   getUserInfo directReferrals:", dashboard.directReferrals.toString());
 
   // Get system info
   const sysInfo = await proxy.getSystemInfo();
@@ -57,8 +57,8 @@ async function main() {
   console.log("   getSystemInfo croUsdPrice:", hre.ethers.formatUnits(sysInfo.croUsdPrice, 8));
 
   // Verify downline function still works
-  const downline = await proxy.getDownlineUpTo62(deployer.address);
-  console.log("   getDownlineUpTo62 members:", downline.length);
+  const downline = await proxy.getDownlinePaginated(deployer.address, 12, 0, 62);
+  console.log("   getDownlinePaginated members:", downline.members.length, "total:", downline.total.toString());
 
   // Verify findNextSlot
   const nextSlot = await proxy.findNextSlot(deployer.address);

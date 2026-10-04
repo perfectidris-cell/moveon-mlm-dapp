@@ -1,0 +1,3375 @@
+{
+  "poolCro": "9000000000000000000000",
+  "recipients": 561,
+  "totalWeight": "379000000000",
+  "allocatedCro": "8999999999999999999681",
+  "remainderWei": "319",
+  "rows": [
+    {
+      "address": "0x6bf19475fb03376fcfe43f9ef70d596425ee476c",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0xea48bf8eeda3d28ff5b7c5991113fe4b6eab251b",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0x4e8cbe9f05e382a388a742ffd75b4dd015dfe181",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0xa144432ac30ec7bf6300db04e12c8f459d92ae4e",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0xb07e4f21d611adcda05b8d85d353268ddc76a026",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0x03f0f0fea0d0cc7bdf0f4544ba08656152cf24ba",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0x5488d0c74a637e1754dde8bacb705c84ebd31c2d",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0x9950496b857fa5a8817f0675bfd75b76e5000164",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0xf39b6ade707476a841f56e69b74f508c10709783",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0xd2a11b015b69963a5c900e79534aa3dc48f857fb",
+      "level": 7,
+      "shareWei": "303957783641160949868",
+      "shareCro": "303.957783641160949868"
+    },
+    {
+      "address": "0x638e6b17eb4e2a49fd91c4c396d1732e8acdf3b6",
+      "level": 6,
+      "shareWei": "151978891820580474934",
+      "shareCro": "151.978891820580474934"
+    },
+    {
+      "address": "0x05f6ad9b0db3a7125c11c64e84fa6aa8eeb242c7",
+      "level": 6,
+      "shareWei": "151978891820580474934",
+      "shareCro": "151.978891820580474934"
+    },
+    {
+      "address": "0xcd8576634d437bad41d5c07bbc69113898c52c48",
+      "level": 6,
+      "shareWei": "151978891820580474934",
+      "shareCro": "151.978891820580474934"
+    },
+    {
+      "address": "0x98b0d2911d0831e928d8abeb3732daf8b2010169",
+      "level": 6,
+      "shareWei": "151978891820580474934",
+      "shareCro": "151.978891820580474934"
+    },
+    {
+      "address": "0x7da45347993c37e4834e27076d782fe3595b2eda",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0xb3bddad51dab231c836afb6711abd0bfff2b6770",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0x3ffbf365360967bb04f698c8c42a27073811e9ee",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0xa1ff945e2b723ec47250c7bb96168a7b8a79a502",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0x76a8a9370ec34775fbf6e50398b1d4095fcc7030",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0x635c1c5c552a22feb4f5421cd28a11227d3c8bf9",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0xa14f69dea7a6c69716a8205840a7ef528d79e06b",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0x9a538bf3e29b682af71523de0ec3580599f0acf1",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0x9e822b3f796573d3bb615300901b296df7f77cac",
+      "level": 5,
+      "shareWei": "75989445910290237467",
+      "shareCro": "75.989445910290237467"
+    },
+    {
+      "address": "0x17ef2bbb1f1a04108cb6ae8f5a52d79d2baba95a",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xe32b7bae703a89ff162c7059fa804ac490582c72",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x8a56afb8c5bf77ed84d120bd5f9e0a6caf7be951",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x9afd1f504afc3654bbae28c6a8be90ee4856052e",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x1acdd31c28439aa9b44caf515e436edf6a5d70c5",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x92c63ab12e299b5a883e788e6111c1806c5f91ec",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x9602b81923e7b35952dc86ce0a9b98abea231355",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x0b3dc4c1a65b0ccbeee0c7069c6242db6c461a5e",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x7ee251fcc4f1464c235dcccd402689ca41d934e1",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xf789195b63cc454b0361967b6d7be6a570886ab4",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xaefa12d0a41bb848973a13c16f7ed3db6f2df2a2",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x234c8737438a54203daf3cc66fddbf9a565f2136",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x8e0263172c9ccffbf3565ebd83989e7662da42c8",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x34b8be468e12d45dca7bc221bd694b2bf8b14ac7",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x4dd5437174b7ec5d3b18dacd2af63eab901926a2",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x88f0c956ce1a84f613c8617d4a6d9a1732960e2a",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xd2bc6028fd8d35086757931d017539bce3c22357",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x2b7f9d562867183a59bf5cdc0d9783b0b6d1fd6b",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x82cd114aea4498c057594c5d167634029b5768cb",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xa3a28abcad1c41ab083c595a611e85a68425c8cc",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x717ff928a3f92ee2cf31ca836c169594a7ec848d",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x72476fe5c27236327e4bce146a0ea7b0ac1bd276",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x8997d02227918e91ef03c7b267c07bbe2c8d1442",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xd66779e87e407838c32b308ce8a0ba259ec9bd4e",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0x297c1a39946e8611f91cbd066ded25ed4c84a3b0",
+      "level": 4,
+      "shareWei": "37994722955145118733",
+      "shareCro": "37.994722955145118733"
+    },
+    {
+      "address": "0xf841fc13e8efd348cebe17b31b30765cc97c4543",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xa6c1ee63a05f35bc833ea2569e282dbc159aba37",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x372482f12f80e78149a7735980bfddbad7b055a2",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x1a587ac3c976d927bb19a3dece030fe3419a6612",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xfbe5b7a8ea723442234d1710b9ca511746f20846",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x6b9d21b1553118e72a8560feb27bc78a44e9655f",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x66e6af8919093ea81f75e156aefe58977fde636a",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xae95f503b99f0d04dd6a248487e8be53a0261d4a",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x9a6ceacf30d1a67966c6b7786703b0792e1b3679",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x7d367f5dd3c47ebe4d0fe3fd1a099e8227a71ec1",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xec4bd420e9da66e2f1aa14bd74909466f6b05ad3",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xb45752197ce29a538e9645ea51d5bb98265d5753",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x47b47ebdbc079e83515107caed8c009a36f84445",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x8deb3cb02bd6546335c879f64a5b748bf9ac3f7b",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x80b5a3c3243d468d7abad69949658e391ef73af4",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x20f8a999bf9a7afc5aac5be9a97020fd56da2fc1",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x62567d0b70d563aecb9d10d0a50b8908ceb76597",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xd5b4dbfc107479b58b606eb58088a94da2218f85",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xc9adbb13ac011960ce48329a1ea161e1c126c551",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x1014f79b80165dc5b6640ec456ad08972952f46e",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x2135127ffb6b1634a27ffcd55408a876a7e098b4",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xa1b7fbbad76fe90f48fcd757cca9800454162e55",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x3d9750b5a072383a0fbc753c89254005de581dfc",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x84ee3b224ff6c9c72d122b2d78066134ffb4cce3",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x0377dd81cc0f4f014c0698125723966eb8291af8",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xa1aa0c45cde4098aead60df253eeb780991ec133",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x44bf7d0d77b1a843726bc5e7a8400f5d91a6eedb",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xb3dcfb8b5a1630f72d1a5cf64f7abcafdc9f555a",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x2dab3d63159d9ad85bac1f8cabb6334a0f25e9a1",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x18c776ae94843294a9e5d6b204db8aa3ad9580dd",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xc6fb3d65fd4c39c794e67f035345776a601b7fe5",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xaf7f14cd0bebfc59c449d2c31d1b29c9e0fc0b93",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x29cc2b73d1a099d8f3aa86d9974413c9fc20d720",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xcaef3e43e4a128ccd68f5c9e4d1845d381476100",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x82e09c7904a82da32ebb0a72f3c31e8b9949992c",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0x773012d5daf21acbb8d5774d8116820a99822d97",
+      "level": 3,
+      "shareWei": "18997361477572559366",
+      "shareCro": "18.997361477572559366"
+    },
+    {
+      "address": "0xbba2238e37145b5061e9f4b31d80f0313317e084",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xe0ce4805c4f966ce35b1139bbf41b91c90317cf8",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x61a675eb50e4ac2f3344203950650a629e6a40ff",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x43f7b9186cf05458465d89dff63d366e7b444450",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x75df9a8b163b5db0b062b75767fa9ba2c8a9d087",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5a463a27ab57ce8e2d05a8fd21ea7735975c46b4",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5a1cff53a4f8bb285d385bc7ace51d8635ce9bb7",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5b4eb1f283ccb17c228f795138a32d2cb7f4bac5",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x335804cf89b5e7bbebe9640f2b5261c09b4826b9",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xc4544261290ea5c71c58ccf193014024a8f450ab",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd8383a4974830e2c661e00937a740961e6cfcf6a",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x6076da8c8ff26fb116c0f5d4e641c688c8a65b6a",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x69345968eec21c3c070e698c454bf1bf62615172",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xf942164c73a5cfef28414de6745090652613459f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x968e61795cce6023dada00158ae569c7d5a45cb3",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5284583b8ab672bc6192eb8abe8ecedc3f37ccb0",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xa1b1c47c55643d7114381f39cd4886fc0d2f768e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x0263f95641b558309d1fa662d04e8929c0bdb77b",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xa046e964e2669396812be818b8b98c4ece08d68d",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x0a2bfd64f4d63e9c850a962b6933cf5b5a790f55",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x567e0a6ef161cee46f2cc9d2c32665be61bbdb82",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xc211605d800bba5117cc9e59353c96fc30c5e6cf",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x470a2be3a3a32c30a11a37e3bec08911ae5aa9cd",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xcf87e9915fa6ec742a96d5b6c77d63234ee3178f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd6627da18534ca829336f6a94794f991820e84cd",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x630f08a03301136522f0a94b80c022340d789823",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3f62ae40292b84ac9fec49c3597642ea3f94a525",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x76a307611060927f5ff00f50f67a53778316a62f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x30563dde4f256efd47c6d56ae090ce273f4eba40",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd3249e35fc3d7c6259437afd2d40b8be26d0201b",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x0babbb4b07b09a1beffc04f3d1dc01de4e918e80",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9cf6381684bb0dee2a76b3cf396e2fb954fca9d2",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x77fc8c93b9a22254e7d68d00e579f0cb3bac8024",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xc84b57ed7b84563208c0eb02efc6675925a48612",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3670ef3e96da30e986fa2c04adb0ca5c8c7553ee",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xea5bb5d06e544df054e2d817015ca537a4c9c2a3",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xa5847f1b6e51837b43b0ae65152ff528657b688d",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x20e3b1e8309b438f77ff6905e1e7d7e17d99b78d",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xe80f9856666c637e3967cbcaefbab4c8344d168f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x8fd84d7a46038f507062cd581d906eba1d245e59",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x6231e03496061e3ca694b9f36b6f8a4b98c29892",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x4f8005a76ab3733e21b3cd879c8bae7c3b4af7be",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x06ba63143c8fc0a1529d1215a23fd85838072602",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x7ddf6ec19aced6fb2adf9f12f7af15281a569b28",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xa2c63dce1d22e9c13e4d6d68d2035842527b53e4",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x8004e42d4a945759e98f3e2ac97e4af48a1bfcc5",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x2bb02600265be7fca8ba2c00326eaf90c01a5d10",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xdfee6ed67f850389aa0960b6a8b26571d7fcf861",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x7c196111dc0f1fbdf9124b4cc97557091bdb425e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x777401ec3f3d397c7f50880f19312bc7d2633154",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x0added446556bc5ac8e1a01758e229762e373709",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xed99096151c02f8779f6da7b71ca2d27fcec5ef2",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x75aedd59baf1b73137ba66e98a3b7012afefa739",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xb6765f8cfbdac20eb5c3b5e16dab6eed2f974c29",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xfaac490e03bb307b5883cb89cc1b3474fc086c81",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x499e0ac96c01cb466bbed84220f45b47325bb733",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x76db6f8d99e03927b139b31a2467a904517403ff",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x46e2ca9aefe5d55882a6dbf5411ed15a9deeaf4e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x602e231052cf03a8e461319e64fd433d9b15af84",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x48ec10cf5f5385bab95454ce0a622dcbd556fa90",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xac4c461504698379dbf0710e190173bb4a26731a",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3352788fa4197d39b84666845ba3c52c53807774",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xbd5c8f5ed0db0fad56368a6f17bd76ba93f5da9c",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x02111511e80e520f2c438adae9c58c79117349ab",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9a0e5ebfe5751e8bc34c7dde639df77c1dc1913e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x62c786efdb289ca5e6aab231b3532e8e3717843e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x23d291be540b393b67fbbc54cd47ddbe84d9dd2c",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xcfc44e53cad9b465f453b199eee671d0c5d54c29",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xffcd8cf4423e875df233945f08bfb12b2aa47ceb",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xb584ebf5ed6ca7af6bcd989ca9e7e4318762ddff",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x4a636d9069329fdb5fd6989dcaf00f16a18be6a1",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x6abd4f88dc02ab28294de1d838302c4dbe38010c",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x170bf01ff6cc09fa277cefeece68304efe3a077a",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x948a1f5a44a50701a404e5fb9e4a08118b112e5f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9ecffae084703d496ede02530831e6366a6672a9",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x271573c4d6e19a0230747b211778788b6b9c10ce",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x2891bad60a4fcc30cdfef9f639b894d7b7e40192",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x67bd12a635314ba5795fb4032c2def270ba4dccd",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xf86789fd990eac70e58c64947d55b31e48773465",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xf7c29208865fff7e3d43f9fe7e2e615acda40727",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x8d00ed1da8395234115cf5133340dfdb0f5145c3",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd70d352a825e8984a16e0e3f830d02189f662f1b",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9b4034bfa4eda94c05fcdf8bfb8928f059bc1f09",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x6b02260eb64e7fa99a24c60ee379606137a2a8e4",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3e0626791a7eb64f56b5ac4e4ad2287f825ac179",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x15ce8bc89bcf76c976c136b4c809930ef7809de5",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9d9d978fc1ce77ac8beca4e4819fc3d74bea87d3",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xb371a2003800a6961c2913ca81d191d90344b814",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd26c643452597722f5edb417a5055263c3bd39d1",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x33d355533fa6c2488bf8c7c005ddd16117b713b8",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xc2ceeb1d4d84dc3c85c35e05d21c9770b568b13e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x79be8af6eae45a9abc4466ddd2bdd170c656ec74",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x95c3f58d833cd2c9357122c071ce316fc5dc0153",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x4e1acd4a13b87817d15716288b60cbf99cf1e1aa",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x7f84921d3ebd712d5da98d44be2bd374e6537556",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3b755aa92a78151b8b0b9812c0c56ec5afa6b2ef",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x1480123c7c0c380acf481d57f48e8acba89f4e6f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5afd46048d95118bdfa6ae6176e539c4122d0ae1",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x10ccd451123f92e0c962485e6e99e0d5fe2b2d62",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd8c1a37b09b2ad5fc5fc3bab63ba2836f195eae8",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x972180d58837f28417477be9bfb8e5f83d9a2b2f",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x24dd3425091e194debc21dcc054ff4ca16715c0d",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x00955d17c1d5442c1ec107f50e29ff323cffb19b",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xea131bb090093f4e4a6b7f93c52e0c093b7453cf",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xe25686802dd662ea8e488456a88b9b5f7815384e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xade4940128491fa6f2a5d2b535ae4468e1f43016",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x7c347070da1c3eb43205268888a913220cd3f108",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xdf839b5cd6f09ab42dd5e154cfb30f74a7124810",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xfc454750062889b683fe456867f6ba93b51e30d9",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x83c7c225b8b8e73a8f8a996cdf07936ec03a4235",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x45c9ca708f8d743fe1d302fbe599935011a86538",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xb38a8b07252596e275a069d898c8dc11652b2880",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd4058442d7ce264083ff5cbfd095a698be795b3e",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xe83d00d9a00d152e3669335d0460eb4cce6af035",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x64ee2066c9f591bb0be0ccfbd9f23edf5d772172",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xfc5866ffc7fa79f8ea20087e7f97a05481adec5a",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3207b2334831cc8b4af3c47946a95fc3cedcbcac",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x2fdc605f4a7f5146128de91542fb6b8e45408a41",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x284e8d512442f8a72a630e33d14f760d3ceb0e93",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x818fbf211e9ee53fc77d7709e68cb6a61f8b8417",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x2442fc03e6d655b3fd43f97d4bc0b4f4a48d4598",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x65f5763f6d1d47f419cc6d3a47a88a570375c673",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x1448f742b9719fe259600aa007d9f3e23b1229a6",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9f9f9cf05509f59d79493a7ee47cf7c579db42f6",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x41eae34f004c5c67eedf13a4edf6830e18535b12",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x220f5177eb953ebce2031b3eb64bfff2937924ff",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xb6722fe969fd6af5068b09be913934731f448b1c",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xad44d1d60d50d1873b99cf17d15d4734ae3c0ba5",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3e48332ab1501048a4e2e18d9bb07494e3f736f8",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xee30587564c19271d06ab5fb372d485f3f60e590",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xe754b27498f2b2f1be9fa74f3ee6415f9a064795",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xcbeda8638252918c4468042c11c5c8e3f3c3ae80",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5faee090a7ab83b86442aad351f1978d78bb7e37",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5247fecabd4257548ce783d2b282618f0c5e5225",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x54c57d3870c5fb950605fd05caf341e86af174eb",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xedc6b896038c8f4ae2d39b4155aad35889ac5441",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xa616ec23229b4667b6cf0f591af916c4a7b386bd",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3b59c2fd13b44841d5b588c1055ea0e2bb0a38eb",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd352b60b784e925d52b58db828f41bc2bdc1daca",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9aab1643e79d31c3226cf55abb12b683e115572c",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x33f68c2190f6090a4e166492dbf2db47b2199684",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xa734a3b0447ed826814a5ac51909e294b620c352",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xeb1dfdd6654c51c79865f8720cd550d7a9f365da",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x7f979a6a34434016ecbf6454a947fe152489b8f0",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x990e287cf50129dc73675acdad5b81d26043c6c6",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x44c273160416942759a847d94ed81c9a8273c9c5",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x167315ac4af7be0c6d8c966e274a67ffb3c772b1",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xd1657713b13010516bd1ea556e3d3f643de7b352",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xcb545bbeb30b46ed36dabcde21253ff4a6ee45b5",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x69fdb4c37d2ed8341e4273b511c25902a57f3975",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xbb948e43aa57949a308830d27681498532bc1911",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x3f65f425b23b8239627e7c69c436465fe63313bc",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x449b0a40c46e1d519c2cb4f78ce694724d7a02aa",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0xee589a4d29c64055939e38813be65d8db0667ee9",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x4d70ab91e98cf0f67e76e7464a4780dde755e701",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x67d121e33576189d41d5961615cbc142d6396037",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x06520127ab1f335f1a7b41bb4c953c6b6304ca6a",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x9a6058a45352c82451b0c97659173ed545cb408c",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x8ec54016a25418d3014ed8ca1f7ecb15cd0f2128",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x239864cc219779819ce79fd077f3e4ce54df75fa",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x09b4ebcb3547ce15e6f5b00239c07b98ffab2719",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x8b7ae5377a6ce6d7cafa7e4d5728e928f34d7f66",
+      "level": 2,
+      "shareWei": "9498680738786279683",
+      "shareCro": "9.498680738786279683"
+    },
+    {
+      "address": "0x5c6bfa14dd017ad32b3f7960a77be73df2a67574",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc2b98c4f9ae7f644323330d2f48a6d88dbd9ae35",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x405f5937919aae7ac98d0c2e02bceac31551584f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1c8787f6304aa2bf2ef0b88432eeab8fdb377afc",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7552ce4ca04cf8a16e787b2da3509c41a569987a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3895042591cd24a2569fe1cb92127121cd7bdab8",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3242040069efee72eda4cae19ad725bed74fee66",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1ef5fbdfd6356ee3bbd9c5d244324f1b915f25bb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1f5a5ed829dfa60ef443c907fc42b59301ff5251",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa7dfea7093c31adcd14859eb09863414fba7ab87",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x54891917493bec3b66802e7dad0ae3230d542b03",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe75af6b7332bfcf5cd35d6f82770954e379d2d33",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf25f90ee8087c3476a9f9456283e7cd6ddf1a0dd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xcd58fff9b9c70982c81a9fc8d76e487b45e3771a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xbfbf1f327a30d75b825ca61034d69e486f80c7d4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5a5bf26b6f38772845e7341275d06e99566c4050",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6ff45251544f9e90b0f7411992571d5b0f156530",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xef3c6e97619085d8543c73b3be0c1a5757bdd511",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x160f1ba84bd0be34a2c3e3b3aa415ab2af54c094",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xfb1399785f4f61b3f06d1d12ad03ac3eab7707f6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x53482e598ce08bfbd2a5f233f1da191c38b3cae3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x9e636a7d7a433c4a6f728de50c8a3037546781f0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4f5346df62d042fe4dfb179728270d3374d10133",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x55bfbefa72c8ae8157b4522aa7ab099f6ecd25ba",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0ca134ac4a1f9797690c584f897981fa3ad95746",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb5b82cbe4d6f3f9d9d19b72dd687cab39e26999c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x9d8194a2a72e6723f8de1ac0864d19c9d33c9f99",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4f2bac3e34ec0d60d7d8ebd2a706b00bf4ad5248",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x741045be2097167d8b3b8d5796ff1ee777623cad",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xaaa7721b4a25d84ae51780fbf6c17ef4cd23955c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xaf101a0080fdd27388914709f14558975d62b135",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xeaf5148a4e0f2afb34ed68be8bec80074a71dd4a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6832945664e4a5bac36a96d74b229704ce632455",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x81653aff9b486f8bcd365e940a6e72c55b267048",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x87e252196c1eb0fb7e56dc5df0faaf70d2f27aa9",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4bdeb5bd0989ac8cdf9137c40a7a3a3504ed35b6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb91ccfcdcdec692233c24701c812bedf5b6368a0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6e9d68950998c86c43d76a963af9965e58a6d536",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xda5a44e2914526f4b9da0de7a9a74f20b693c6a7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1a21d6fc7c6de294542b1fc26b00b7e9cacb98a5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xbfcdf3f668d01dfc6b139957134ea3fabf7ae497",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb3a88771a3fdcc117b2091aadf9f32c14269ec20",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3ba4b4d05980b67fd3763f77af67aab496ba0c46",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xde2167c78e5f5f00ed3984c64aca5ab9df9b4895",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x214d6ed6884a95ffa8604e02b56b48a3c2428111",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe0a249a8693dbc39987889d706d4f287e126b054",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5e46787dd62fa4015e1c7999bd709c8f8a597983",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xcded0ca74f2d167f1c978d5eb73ad14a77f559a1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x07c6fc387d641ef62f67ca9bc35e4204d39018ce",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe83273f9fafeba4257f7df1435848bd371ec0bae",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6a24ed0b033c4b4f3a6703780b8b6fc7f6b0dd54",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe3596d31d21b680983a6e6e32232a438ce20bfd3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7db51ca5c7c629bd9d6bb9e15aa3bcdb520358ae",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8ff2d5fd0bd2865864afb378445e6db5486fd9fb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x763b2fabca557b69de2fa3a5b9427000c760f88d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6edad35ca7e6c348aac60a51fadf4c85fb416879",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5ebe06877669399b28d4d4947f9a3cbdf79d9537",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf20c252dc0ee2caa399d96902d36d9bdd8a74560",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1079af9c754484992b46df07eede6552c24dbcec",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xac29cf2686bb153d2e5ff3f006fcb268a6405a7f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6ea49e4b0e473a03bd9c524287b8e7b932b4313f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x718508cc0d98dbfb5b59fb785b1bc463a1afcc46",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x97b0e82d316fdb3939854b006849ce6c564879ca",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xde5b19dd6643a047b1eae6d120dfda03e8980544",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xdfbdd37398fe8594364ebe5a30af651038b4efc4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6975f47619317536518662c4599d8b5967d1870d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8ccb99f318998f4dd0eac1fc9b218ea3db46d603",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd25a1fabd9bbe3ec3556c8efeeaaeb815c7b17b8",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7c07cd57f3d59b0d149daa8bac248bfbae31fb8f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x51f4ede422118aecf9d5b6d33df82a6afe5de926",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb6abeff40aa69cdd0050300dcce26021d5e155fa",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xfaea75a1bcb9e29b62d431889af6a3b5ab80b4ee",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa1f366a0af46508d6b8513bb4bc98b678d03931b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1984841d9a946dd4f6998e1b6d2680006801fafc",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x52a1171d0059050c5319b76d30a275dbc1620b58",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc10ce753b7f9806c4a61fe80034dbe547c82dec8",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x471893f5955db3966510e2ef312a66ced7540584",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xfea86814287741317c1317d7bb4316eabfedda40",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xabdd8a0917d7f5c5fa4ee1cfa7045304a120505a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x88cd747d2903ff1ccb14646347e98ee1d73a4176",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd93c39aecf6d8124f323ac164e0800dc77f8f39a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3aebaab8536714a564688925b27de264f3c3853a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x39a076f3dd6c5034ee3cb5b2ae0fd77e5a59f5ef",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x158640e8ba1a0f6c30380f63d2dd24a85e4d555f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x02523e0a337fb18cea1a0a5b43f2a49d76d941a1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x393b13d4dc7a9a58cec85f63d11cee83be5fcda3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x612bcca0e372095ce47019f047197e9832600515",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x9e2f56e7ac4bb53fdb4d0a510668b9475001e1ba",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x546055c826db272aca1044d021a2d8dd6892bcda",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7f68d8fb32b25945b61a616bd96d7b9939bbca12",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc058ff533a4b25424c29a6f4b955deb9e7dd1db6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8c7cee4837529781619cb058f8eba1801c5913c0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x41642086c7e1d4193a859036784272edf8a48723",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa1df94fbc52cea534519b97a86037e1af42c7e38",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf6b329d50d4a71d441edbc5e7bac053080ab1b13",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xbd84f8147559f648c0feedf684f20e4276eaf354",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa416a5d0c4f5484c13db1a15d729bdd1d637ceb1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8fc8914b79c333b02f7f298f44985ef194e426a2",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa3f851dbe7a141691c720b437a45baa4f477e189",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7fe23c25ec1af75a5b034a4f8714a55465e2c895",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb20a8714d2a2f8302ac4c974cf831debb19e7d34",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa385fd05f41e95e30d485f34ac6fa0ed25b3ac8b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x668b35d3dde6aafbac6aa2f5703fedb89a5c319d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xab2112e90c0ab025d5d0726de9c9b7ca1138a6a3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x72753e93328d4c7851340e81a294cd6c857df5c0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf9c831d02da0a4dcfd5b330f44d160ebaba8ca1d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc51918c579d542a34dedde7899c8a0f80e03a977",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1817f2f11a6e76b6d3838b1f828f422ec9f3916d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x054aa2f5843fcbcbb6c8cd2e55d621e4abd7aefd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5bf3f433dcc6bb6d3f65c9b4cb91eaf5a11752f8",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x278b6db2fde297fa8ed362333bc1021295d76bbd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa60c7ef3b902c9cd7145fc2651eca0e89aea3fa5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x955d1d1ef268520c1b6895e0fab285f1b0e1aa63",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb2a1b8689a69d5e68b7d7ebcd6103f6327014fad",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x65a9334677592afb2e5e91309f950e93b00a0956",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2307c7d7b220fba32c9f3dfef1256f2b25f2b2b4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x92a747726cd027ee8a761c1ac6fe2eee81d88e5a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1186f556944f56fffc959501c11ca2c88e5d910f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x27f5f2149813e977d79eb7412922099066855b47",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xcfd4e256f02cc7c65ffa364cc06a71ef40a692c3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3992800bf20abb8dceffc655e02fbc6415dc179a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x05d9d8a516c64cea6c170e776e35b41f1258d322",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa5255cc98ed3134e63574cfb3e32a5feaddab412",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x86218ca64a693a59d81808271c044fd36fdfff18",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd156df33f72774931d9c712e42dbf05fcaddb22c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2c2b27deb4f025a7762ac5104ed2561232c712ec",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5796d43e6fabc81a2568a557fadb5b3037372e7a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x607bc51c06d0af5f0711ab5b8fbe402feac491a3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1c23b140334edb35a80264fb1eb5414be535605c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x63f133cd5d68b09d50c8517ad8812c82418f26d7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xba1394b9a3d7590d4e6fb3914ce46c4bbcf5a2bb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb36a2d1fc4e5d2475cfb3a24853e04cbed240172",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6c92d7178eb44126a0906515ccead226c3369865",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6f1239d5c3ff3d8cfeadd04229f1c4f553ed3234",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xaafb8c2b431ee1760dd0b6275367a38471bd7c84",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x27891bffdb607e7867b45f5a505afd2a7a380683",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x50839f8390eee6064ff7aa4ae9b05d02cf1f4ff4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1ac5192d2af0a84789eeeda7b42ba99929cba18f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf3a36f8b47bae4890f60795625455a063a4fc7ff",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xde9f6fcb016f9cc00747022cbfb1189e2924afd5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2886e3973add2b4ed6c34921a0722435892cd1ac",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x799754cf443ee6eb68a90547c39fc424d7391f29",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8932ac8cfe4cb34ae4a1c172e5d581ffddf61eef",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xda480c0c4e039bae98e50e365d8f248aa7d2a927",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf03a407d44a770fa8dc90736297d8e1465627585",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb9cd0993b296314fd74b5662e89a48e83c1bf9a4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe5eb1a155792d3c9463fdd7d16d7fe430845ba8d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1520ce2fa423ee3ed74f0462e8f236f9fddbcdf7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7831c4eea4784721bcd39923b7705d3a5d6ca938",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x16cc3c4cc58adfbea79bc3b50c0eb22552aa4b77",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xdc8ac73b2ab97fa06db386d32441eb337e086605",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6fa6348e4c1b75162973672526e906e01323fcb1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xcc776464b51ad3935a9b62e082eb3177c8449feb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x76f009c691ae82602a81d1077cfc0755c63be61d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb2c5c7fce6e8db23b4b9e47e49128f463a0d7276",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x81cca49e6e93ed1cadbfca66ad2461bb22e9f089",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x18545aa50f5ddd3c7bb017a7212d63c2decfac09",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x53473e2305f9612db539a695650d4ce5d2cf7abd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x50800aa303eba69b7436546016ba256512e73797",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x49784bad3c0f8ec181ecc5045092c553006660df",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x38789c78ab4cd99f4da64e185f59feb6eceabea5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x58d3baaf56e9aa12bed5d0de1092feefc374999c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xdf02ee88d6a071169b2022444a34b07a05c3f755",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x086673d8aa0a80b7c593bab59f393d656927f7ee",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6efd4de7229628dab38c011c0df6cacb01cb78cd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x447a0c09262525134e3fc337a2b9f8d0efe77bc7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5cac41b64127afe04dbfd86c457ff184dc12913d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb8695d5ff6505684f7ba7b694fc4c634a14d291c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x72c9a22ffcee812b3c02391d08a445588bc4baf5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x084f8de18cc254084cd5ac4ea248977039894f0f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc47cf9e61bdb10950f36798df13def8f8d4dd01b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd33d103f7fa7fe2851b2808c301ec95db7b2bae3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8379e3f3b190db3928518087e27ef160a05d9b0d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8c98f1031c40a0612ff8ab425e74f3dac0eb75b7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf6c97e2d12b2ec1adab1e6870e00a3f5d15c4fb5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xbbcd12628d2b18ef0508008828dc9cf47c2cdfa6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3d41f9a5319367d3d3e2ec7277400cf96cd13b2e",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb56582a81a4c5f1a9dcb556ddd158bbd4f381011",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0f1b8981913332856ded8afa740198015352ef9b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x76d66cdc27bbda6986084355cfd8fbae8de27e8d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6d5499bb279ee5d4e50fb265e339560129351010",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xee16b14a5c7fbbacd96561bba98675687f7a52ad",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0de8002d1e326c5e50babcce58a156147ddb16ed",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xfd09745ea16c42fcbf2d9fb5d241d6bf15c8de16",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x730d3ff51a1cfeeb7f60725d0d250f2f1fdd5ebb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2b74e20dc618abe2a21dc847810e25d768cc8da5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2761740c893baadcfdda1e9909f6a24b04beee19",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7a0d917276921bfdc3934ad3094bf9e87ce8bb33",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x98ccc65e7243388b33ece8c0e38731f73289a025",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5dad38e1fe96cf6c0409ccfec1c71cf9fe50c194",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x17a602c8668479fb02ec27ab5c3597fc733f5aac",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x45d6cb1b541b89a822e6edd152cdeac8025395b6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3be279db8a27a3672f13ce0f6e1374e703a02df1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb6a2f2c3b516d822e39a34ad4e08dea60e6e8d4c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xaf30e6dc64b7b726a5a15c96e6ed38e065bbbed5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6bb2809f907533c33db94b4b3444d2fbd6cf57ac",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xad2e645f6609b61e087056e34dd85e5d4311df0f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x42498e07a96e92989ca89296503c92d5f4710d93",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd5bb08002c7db6f318e7813c89192bb2d7878326",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4e23d504a4085c07d34e88c13a426571b48ddfb5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1f27df40ac4245eed57644642ccbbcd9f88e57ca",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8e3221625a813fd1daab0e77ae89785e34eff268",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x69eecf1359bf02526d6f1b40c8fa7608972c2ae9",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x00cb5c8d284d6bd43b5bf91efb3a27c811594332",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2f5fcfc8b27b0f6ec3fd5923d7ae66ff2323ef94",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x653ae5ad0d8ee34af8dac4743fa93623985f7d81",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe8dc775dc9cf12571d5abf7aebbc727e8208c445",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3e9d144ef8dc9c117ae0786a2ba369d3c8f8529a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3df440ca882025b54bef6519ec1ea99023505ece",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x039209d57ec499eeab058724399238a77275e726",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x70733657f0b4584a2e416917842ac720a3f58e17",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd8e0ce87e02667949baa4a3c0d5d591ae65641f2",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x27aa2e9565abfc9196474b4f00f5fb6dbc94022b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x392e9ce0ab9d79b78540b34f2be77a73aaa1c637",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3908f54ca7b837c4e607e532b928cba1a48a2aa9",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb236e310992e57b6d35dba0415c53a43423384d2",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x061be97e3bad3d2890e277d964a18b0ff4ada01a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x720df9fac2ce900495b48e77bebaf61f64b30dce",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x88fc023b923c11a849f9359de638d930ca8621b2",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x17e8c0397c8f898170038d21e6ddd7b8b15625d0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8b50173f7dbe937c62491d0afdeb8ae85989fe14",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2f356218089201001ea0133cc50a70b95fed302b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd91614f93ed462b8336f1e953c8fc97f0759d3b3",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa29cf735d5424dca0188c6844e027f9e77215a36",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6295cc087b6214bb9a6073fe3d5c39bbdf6f5397",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4397d0f4725cd11f6355f996776176ea375fcbdb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x79d98a7e5ab9e66bcbb7057241d5b05ee939dd3b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x91588e50be976597bc9cc4f8471e8b75ee31dfdb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4e0f119bb72713ff977eb2fdb52d4de88801da52",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x59f3ea34d1e1bf9c951fb08729b0a4ab051c431c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5f183f43a88227b130da0131f3c39cbf25e5bca9",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xda1bb792a2ba574b0916d1513b49522d9e8277ff",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xef0a4ff9b612d89a702ad414aef10e5036662622",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xaf97a85543ff4a915a0ba762d6e51bc7e4895dd1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xdcff876308b12d77c1744732132eb1c8f1f49c79",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x16f9447ca3c815a3c28c4c83eef432658773bf77",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x45cb8b586cc06158150817a9c8748b97e7d47aac",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf462c28485845289f7979648b5a4378adf7a41d0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x9de623265c4afff99466372e4bdb31db9cca69eb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x94e825c4306a368e9d03ed2e109f7fef58a305db",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe9da5042da2d8ec54d2fade161c0e849c11864dd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe31e6a9e9a6770b0ff0829cab031aa1ac3e523cf",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6dc52afaf95fee685c4d81fe6137ab2db1b514a6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xbf8975cc8e8ee177488ac484174b14c2ab060c94",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x950398d4d3ba31e1804b9c235b6787f5ad32db55",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xb396ff6459904e183b79204a072c0dbd42dbf1d7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf60ab437991ab36395e808292a41c2af32a193b5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x360a1c7b739acaed9863353dde0357ce9f9c4564",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf10db4114e917577ef213ec93a3378a64d108588",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1766fbb3d81b7effc69f1f142e2861e8912d419f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xea8c2f9d4e22ac156fdf607daae7b3bce837a7ac",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x45c568b462551605ad5ac9f2220d4dc0fb9f8182",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6b637bea8ddba25e175f97b25dbbef896a0de69f",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3cb096c4beaa72efefa2a63c83be0875a8ca7b11",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xeb590138abfc4343a7e939f5ac22bf97c0a7ac09",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x43871143ce246a1f6488b9f0f3734d08d982da3c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3de9697db787288d78c4326ce7864718e757e355",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8135e839e33cff8d13bd898b1429fe41c0398ade",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1c04b1bca9a130fa41e836516a49a182e101ff7d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0fb13210a07ed2c7e96fa60c111258949be5e8fd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8c5b9cabecb1ca055803a512386db29fd8f3c199",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf10cecd9ad8e5089c9e8d249e5fd4590c014c10d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa3d69f48964f92caf3d74362a5ff33176da5c675",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4eb8d4506056ec90a122642aad5deb59f2311a7d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5920de1c6374b5c46e63ceab5fdc88a8cf62c828",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x72f19e6b3dc315728d6abab6048bd248d8df1ebb",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x79df82e157c87e32b28a1620b9a2ee5394fe91fd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3592b2dc19688892216d83980e545c045be91e0b",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8a107bfbb26ddea7a6ac8571a1d1ceb7918f30a6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc050b8e54823edc0da4db1d2b7a49c69fd9f9ec5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x9b00b038a3e348d1faa2b7b92839fe9d9182de41",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x3fc53fbd9a1fbd12b8692381a327840e8b04e2ad",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x74aab8cbe21caa04047deeffc0cf3bbb0ebf12ea",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x597c84cf4e9f1d6ab4106f119efc9dd25ce0cb94",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1b5dcafb3906900a006ebd10ca597e1972ab1c8a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8b854b35aac9aab223296258d5ff0356c8495757",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xce3d861ec27bf00371f582974977c16db28b1f8d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0c6f721f4a508eda9e5422ed6651bb6b538aa002",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x51f9d3a00e80661e3f166354758a5e7804e8374a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0dfe57010e592cb02dbfdd23e1850e6e79ec20d6",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xabe507d6d32ef198d7fb32f9d13393e8aa794590",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x608bbff4b863d7b474f34dccca685256cb71106d",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x0b5d3ad783aa501486fc60fbaf4a3067a67be007",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5b85efc0e1cfeb8290920761b842e1872516c4e4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x79c5bcf8d20a67fed4d0e8916eecefd5e236695a",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc3fa768c554427b946a7c031a27a1478f935fcc2",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4dcd3b034bbaee4495990ccc45739b0c710089ff",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x1cccf7dcbb0e85a356bbab7d20325e94af96c5a1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc9af25c656ea5855431ced5e80c79c2da5b1f092",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x35375b1db7b1d0655c6b7f9c3fd6dabbcfd01abd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7624962f3c018bb92278ebe3dcdc98811ea9066c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xe07abffd7038bf81d54e0d9506bea08e63e335f7",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xa7ac1b87ee9b2f3853c32cd4eaf1179528547561",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x606244b6d6716b875817a5a894580a63689b9d86",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x7df125230cb9048b9299c9a4dc1c5cd2abf32835",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2ed61566b65ae2131ffb37aad9a3e917804e14e0",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xc54e10e16bca4d79ec0ec5605fc7b5683d2f0078",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xfbe5dbfcb5485fa6d83f769d97a7cb9d613e0858",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd6a79f323731a9cb90cb3a52363306ed5f566e76",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x03849d062cf75aa889f447a858a726f4769e2443",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x27d7f78f27f03256c7bc7394f55690c6c4c74bad",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xd1173cde3ad88673fa2faf8a7fce8ad4600c9891",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x787e07699e3e62222e07db6cfa49cde1b1733d46",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x4eb6d63f4aa129ba4e2c8caf5ffe1f636d87ba3c",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x8a3c633a347921139179f27f68b60402c4ac3270",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x6411e8b62f223678bbdff0646b384f933dd893bd",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x954eb1f171d604beee0c0669fe0939f1019d1ee4",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x5dad57caf970fc24f010ad93d505c989a2cb2ab5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x9e1cf62449d1b3a2a8dc1b805b9e52b4729966b5",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x2bd10f2d0ffec613c8aa0d6ec7a17cb782fc9478",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x65b852c6bf0de68d641dcd6a75a0018e0afc84ab",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xf7df1debe13da12bb300d40f0167321543a19f28",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0xac9454f54f95e1b39e7589ab2384709424b3d714",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x57b40f587b4053f328226c76f89c70451feb2557",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    },
+    {
+      "address": "0x86cc5c6a8bf67b2e04f8717ed143f7032125d9c1",
+      "level": 1,
+      "shareWei": "4749340369393139841",
+      "shareCro": "4.749340369393139841"
+    }
+  ]
+}

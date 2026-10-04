@@ -26,6 +26,7 @@ describe('ReferralTree', () => {
     const contract = {
       getMatrixChildren: vi.fn().mockResolvedValue([]),
       getUserInfosBatch: vi.fn().mockResolvedValue([]),
+      getChildrenWithUserInfoBatch: vi.fn().mockResolvedValue({ childrenByParent: [[]], infoByAddr: new Map() }),
     };
 
     (useContract as unknown as ReturnType<typeof vi.fn>).mockReturnValue(contract);

@@ -1,16 +1,18 @@
+import { PLANET_BY_LEVEL } from '../utils/planetLevels';
+
 const LEVEL_DATA = [
-  { level: 1, usd: 2, label: 'Registration' },
-  { level: 2, usd: 2, label: 'First Upgrade' },
-  { level: 3, usd: 4, label: '' },
-  { level: 4, usd: 8, label: '' },
-  { level: 5, usd: 16, label: 'Mid-Level' },
-  { level: 6, usd: 32, label: '' },
-  { level: 7, usd: 64, label: '' },
-  { level: 8, usd: 128, label: 'Advanced' },
-  { level: 9, usd: 256, label: '' },
-  { level: 10, usd: 512, label: 'Master Tier' },
-  { level: 11, usd: 1024, label: 'Elite' },
-  { level: 12, usd: 2048, label: 'Founder' },
+  { level: 1, usd: 2, planet: PLANET_BY_LEVEL[1] },
+  { level: 2, usd: 2, planet: PLANET_BY_LEVEL[2] },
+  { level: 3, usd: 4, planet: PLANET_BY_LEVEL[3] },
+  { level: 4, usd: 8, planet: PLANET_BY_LEVEL[4] },
+  { level: 5, usd: 16, planet: PLANET_BY_LEVEL[5] },
+  { level: 6, usd: 32, planet: PLANET_BY_LEVEL[6] },
+  { level: 7, usd: 64, planet: PLANET_BY_LEVEL[7] },
+  { level: 8, usd: 128, planet: PLANET_BY_LEVEL[8] },
+  { level: 9, usd: 256, planet: PLANET_BY_LEVEL[9] },
+  { level: 10, usd: 512, planet: PLANET_BY_LEVEL[10] },
+  { level: 11, usd: 1024, planet: PLANET_BY_LEVEL[11] },
+  { level: 12, usd: 2048, planet: PLANET_BY_LEVEL[12] },
 ];
 
 export default function LevelTable({ userLevel, onUpgrade }: { userLevel: number; onUpgrade: (level: number) => void }) {
@@ -25,12 +27,12 @@ export default function LevelTable({ userLevel, onUpgrade }: { userLevel: number
             <tr className="text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider">
               <th className="text-left px-3 sm:px-5 py-2 sm:py-3">Level</th>
               <th className="text-left px-3 sm:px-5 py-2 sm:py-3">Cost (USD)</th>
-              <th className="text-left px-3 sm:px-5 py-2 sm:py-3 hidden sm:table-cell">Label</th>
+              <th className="text-left px-3 sm:px-5 py-2 sm:py-3 hidden sm:table-cell">Planet</th>
               <th className="text-right px-3 sm:px-5 py-2 sm:py-3">Status</th>
             </tr>
           </thead>
           <tbody>
-            {LEVEL_DATA.map(({ level, usd, label }) => {
+            {LEVEL_DATA.map(({ level, usd, planet }) => {
               const reached = userLevel >= level;
               const next = userLevel + 1 === level;
               return (
@@ -40,11 +42,12 @@ export default function LevelTable({ userLevel, onUpgrade }: { userLevel: number
                       <div className={`w-6 h-6 sm:w-7 sm:h-7 rounded-lg flex items-center justify-center text-[10px] sm:text-xs font-bold ${reached ? 'bg-emerald-500/20 text-emerald-400' : next ? 'bg-brand-500/20 text-brand-400' : 'bg-white/5 text-slate-500'}`}>
                         {level}
                       </div>
+                      <span className="text-xs text-slate-300 sm:hidden">{planet}</span>
                       {reached && <span className="text-emerald-400 text-[10px] sm:text-xs">✓</span>}
                     </div>
                   </td>
                   <td className="px-3 sm:px-5 py-2 sm:py-3 font-medium text-white text-xs sm:text-sm">${usd.toLocaleString()}</td>
-                  <td className="px-3 sm:px-5 py-2 sm:py-3 text-slate-400 text-xs hidden sm:table-cell">{label || '—'}</td>
+                  <td className="px-3 sm:px-5 py-2 sm:py-3 text-slate-300 text-xs hidden sm:table-cell font-medium">{planet}</td>
                   <td className="px-3 sm:px-5 py-2 sm:py-3 text-right">
                     {reached ? (
                       <span className="text-[10px] sm:text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">Unlocked</span>

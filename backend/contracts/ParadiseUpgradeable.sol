@@ -73,6 +73,11 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     event ReferralCapUpdated(uint256 oldCap, uint256 newCap);
     event ManualPriceSet(uint256 croUsdPrice, uint256 registrationFeeCro);
     event UserMigrated(address indexed user);
+    event DownlineBackfilled(address indexed user, uint256 totalDownline);
+    event ReserveCredited(address indexed user, uint256 level, uint256 amount);
+    event PayoutSent(address indexed user, uint256 amount);
+    event PayoutDeferred(address indexed user, uint256 amount);
+    event ReservesDeposited(address indexed sender, uint256 amount);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -149,7 +154,9 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
 
     // Commission counter for tracking every 3rd commission (levels 4-12)
     mapping(address => uint256) public commissionCount;
-    // Pending withdrawal balance (manual withdrawal instead of auto-payout)
+    // Deferred payout balance. Commissions are paid straight to the user's wallet
+    // via _sendPayout; this mapping only holds amounts whose direct transfer failed
+    // (or legacy balances from before direct payouts), claimable via withdraw().
     mapping(address => uint256) public pendingWithdrawals;
     // Emergency pause
     bool public paused;
@@ -187,8 +194,8 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     function _tryGetCroUsdPrice() internal view returns (uint256) {
         // 1. Try Witnet price router
         if (address(witnetRouter) != address(0) && witnetPriceId != bytes4(0)) {
-            try witnetRouter.getPrice(witnetPriceId) returns (int32 price, uint32 timestamp, uint32 drTxHash) {
-                if (price > 0 && timestamp > 0) {
+            try witnetRouter.getPrice(witnetPriceId) returns (int32 price, uint32 timestamp, uint32 /* drTxHash */) {
+                if (price > 0 && timestamp > 0 && block.timestamp - timestamp <= MAX_ORACLE_STALENESS) {
                     return uint256(uint32(price));
                 }
             } catch {}
@@ -407,6 +414,9 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
                 depth++;
             }
 
+            // NOTE: the rigid 12-upline cache for migrated users is populated by
+            // backfillUplinesBatch (one owner sweep covers all pre-upgrade users).
+
             isMigrated[userAddr] = true;
             emit UserMigrated(userAddr);
         }
@@ -421,6 +431,49 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
             if (isMigrated[userAddresses[i]]) count++;
         }
         return count;
+    }
+
+    /// @notice Get number of users whose totalDownline has been backfilled
+    function getDownlineBackfillCount() external view returns (uint256) {
+        uint256 count = 0;
+        uint256 len = userAddresses.length;
+        uint256 maxCheck = len < 2000 ? len : 2000;
+        for (uint256 i = 0; i < maxCheck; i++) {
+            if (downlineBackfilled[userAddresses[i]]) count++;
+        }
+        return count;
+    }
+
+    /// @notice Batch backfill totalDownline for existing pre-upgrade users.
+    ///         Must run AFTER migrateUserBatch so matrixParent/matrixChildren are populated.
+    ///         Processes the array in REVERSE (children are registered after their parents,
+    ///         so a parent's subtree is only tallied once all descendants have been counted).
+    /// @param startIndex  Starting index in userAddresses array
+    /// @param batchSize   Number of users to process in this call
+    function backfillDownlineBatch(uint256 startIndex, uint256 batchSize) external onlyOwner {
+        uint256 totalUsers = userAddresses.length;
+        require(startIndex < totalUsers, "Start index out of bounds");
+
+        uint256 endIndex = startIndex + batchSize;
+        if (endIndex > totalUsers) endIndex = totalUsers;
+
+        for (uint256 i = endIndex; i > startIndex; i--) {
+            address userAddr = userAddresses[i - 1];
+            if (downlineBackfilled[userAddr]) continue;
+
+            User storage user = users[userAddr];
+            if (user.id == address(0)) continue;
+
+            uint256 total = 0;
+            address[] storage children = matrixChildren[userAddr];
+            for (uint256 j = 0; j < children.length; j++) {
+                total += 1 + totalDownline[children[j]];
+            }
+
+            totalDownline[userAddr] = total;
+            downlineBackfilled[userAddr] = true;
+            emit DownlineBackfilled(userAddr, total);
+        }
     }
 
     // Get total pending withdrawal balance
@@ -445,7 +498,9 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         require(users[msg.sender].id == address(0), "Reg'd");
         require(_referrer != address(0), "Ref 0");
         require(users[_referrer].id != address(0), "Ref not reg");
-        require(msg.value >= getRegistrationFeeCro(), "Fee low");
+        uint256 regFee = getRegistrationFeeCro();
+        require(regFee > 0, "Price feed offline");
+        require(msg.value >= regFee, "Fee low");
         require(_placementParent != address(0), "Place parent 0");
         require(users[_placementParent].id != address(0), "Place parent not reg");
         require(matrixChildren[_placementParent].length < MAX_REFERRALS, "Place parent full");
@@ -465,6 +520,32 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
             require(_placementParent == _referrer, "Path too short for diff parent/ref");
         }
 
+        _executeRegistration(_referrer, _placementParent, msg.value);
+    }
+
+    /// @notice Fully on-chain registration: placement is computed inside the
+    ///         contract via _findNextSlotInternal, so clients send just
+    ///         (referrer + fee) — zero off-chain placement calculation and
+    ///         zero extra RPC calls (no findNextSlot / path-proof reads).
+    ///         Economics, reserves and events are identical to register().
+    function registerAuto(address _referrer) external payable nonReentrant whenNotPaused {
+        require(users[msg.sender].id == address(0), "Reg'd");
+        require(_referrer != address(0), "Ref 0");
+        require(users[_referrer].id != address(0), "Ref not reg");
+        uint256 regFee = getRegistrationFeeCro();
+        require(regFee > 0, "Price feed offline");
+        require(msg.value >= regFee, "Fee low");
+        require(referralCap == 0 || referralCount[_referrer] < referralCap, "Ref cap");
+
+        address _placementParent = _findNextSlotInternal(_referrer);
+        require(_placementParent != address(0), "Tree full");
+        require(matrixChildren[_placementParent].length < MAX_REFERRALS, "Place parent full");
+
+        _executeRegistration(_referrer, _placementParent, msg.value);
+    }
+
+    /// @dev Shared placement/payment logic for register() and registerAuto().
+    function _executeRegistration(address _sponsor, address _placementParent, uint256 _payment) internal {
         User storage user = users[msg.sender];
         user.id = msg.sender;
         user.referrer = _placementParent;
@@ -480,19 +561,32 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
 
         matrixParent[msg.sender] = _placementParent;
         matrixChildren[_placementParent].push(msg.sender);
-        referralCount[_referrer]++;
+        referralCount[_sponsor]++;
 
-        // subtreeSlots: new user starts with 2 open slots; increment all ancestors by 1
+        // Rigid splayed storage: freeze the 12-upline chain now (links are
+        // immutable, so this never goes stale). Payouts read this flat array.
+        address _cursor = _placementParent;
+        for (uint256 k = 0; k < 12; k++) {
+            uplineCache[msg.sender][k] = _cursor;
+            if (_cursor == address(0)) break;
+            _cursor = matrixParent[_cursor];
+        }
+        uplinesBackfilled[msg.sender] = true;
+
+        // subtreeSlots: new user starts with 2 open slots; increment ancestors up to depth 100
         subtreeSlots[msg.sender] = MAX_REFERRALS;
         address ancestor = _placementParent;
-        while (ancestor != address(0)) {
+        uint256 depth = 0;
+        while (ancestor != address(0) && depth < 100) {
             subtreeSlots[ancestor]++;
+            totalDownline[ancestor]++;
             ancestor = matrixParent[ancestor];
+            depth++;
         }
 
         emit MatrixParentSet(msg.sender, _placementParent);
 
-        _processPayment(msg.sender, msg.value, 1);
+        _processPayment(msg.sender, _payment, 1);
 
         User storage placementParentUser = users[_placementParent];
         placementParentUser.directReferrals++;
@@ -510,6 +604,7 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         require(level <= MAX_LEVELS, "Max level");
 
         uint256 upgradeCost = getLevelUpgradeCostCro(level);
+        require(upgradeCost > 0, "Price feed offline");
         require(msg.value >= upgradeCost, "Payment low");
 
         if (msg.value > upgradeCost) {
@@ -528,6 +623,7 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         require(level <= MAX_LEVELS, "Max level");
 
         uint256 upgradeCost = getLevelUpgradeCostCro(level);
+        require(upgradeCost > 0, "Price feed offline");
         require(user.reservedForUpgrade[level] >= upgradeCost, "Insufficient reserve");
 
         user.reservedForUpgrade[level] -= upgradeCost;
@@ -652,18 +748,99 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         }
         
         if (releasedTotal > 0) {
-            pendingWithdrawals[userAddress] += releasedTotal;
+            _sendPayout(userAddress, releasedTotal);
         }
     }
 
-    // Manually withdraw all pending earnings
+    // SAFE PUSH: delivers a payout with a low-level .call (never transfer()).
+    // If the call returns false (blocked/malicious recipient or thin balance)
+    // the loop MUST NOT revert or stop — the amount is routed into
+    // emergencyBalances[recipient] and execution continues with the next
+    // upline. Funds stay pullable via claimMissedEarnings() and are never lost.
+    function _sendPayout(address recipient, uint256 amount) internal {
+        if (amount == 0 || recipient == address(0)) return;
+        // Native-CRO push: empty calldata + value. This is the native-asset
+        // equivalent of an ERC20 abi.encodeWithSignature("transfer(address,uint256)")
+        // low-level push — no transfer()/transferFrom() anywhere in payout paths.
+        (bool success, ) = payable(recipient).call{value: amount}("");
+        if (success) {
+            emit PayoutSent(recipient, amount);
+        } else {
+            emergencyBalances[recipient] += amount;
+            emit PayoutDeferred(recipient, amount);
+        }
+    }
+
+    /// @notice Pull any commissions whose automatic push failed, plus any legacy
+    ///         pendingWithdrawals balance. Because failed pushes never revert the
+    ///         payout loop, every missed earning ends up claimable here.
+    function claimMissedEarnings() external nonReentrant whenNotPaused {
+        uint256 amount = emergencyBalances[msg.sender] + pendingWithdrawals[msg.sender];
+        require(amount > 0, "Nothing to claim");
+        require(address(this).balance >= amount, "Insufficient contract balance");
+        emergencyBalances[msg.sender] = 0;
+        pendingWithdrawals[msg.sender] = 0;
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        require(success, "Claim failed");
+        emit Withdrawal(msg.sender, amount, 0);
+    }
+
+    /// @notice Total pullable missed earnings (failed pushes + legacy pending) — 1 RPC.
+    function getTotalMissedEarnings(address userAddress) external view returns (uint256) {
+        return emergencyBalances[userAddress] + pendingWithdrawals[userAddress];
+    }
+
+    /// @notice Owner-only backfill of the rigid 12-upline cache for pre-upgrade
+    ///         users. New registrations populate it automatically.
+    /// @param startIndex  Starting index in userAddresses array
+    /// @param batchSize   Number of users to process in this call
+    function backfillUplinesBatch(uint256 startIndex, uint256 batchSize) external onlyOwner {
+        uint256 totalUsers = userAddresses.length;
+        require(startIndex < totalUsers, "Start index out of bounds");
+
+        uint256 endIndex = startIndex + batchSize;
+        if (endIndex > totalUsers) endIndex = totalUsers;
+
+        for (uint256 i = startIndex; i < endIndex; i++) {
+            address userAddr = userAddresses[i];
+            if (uplinesBackfilled[userAddr]) continue;
+            if (users[userAddr].id == address(0)) continue;
+
+            address cursor = matrixParent[userAddr];
+            for (uint256 k = 0; k < 12; k++) {
+                uplineCache[userAddr][k] = cursor;
+                if (cursor == address(0)) break;
+                cursor = matrixParent[cursor];
+            }
+            uplinesBackfilled[userAddr] = true;
+        }
+    }
+
+    // Claim a deferred payout balance (only non-zero if a direct wallet transfer
+    // failed or the balance predates direct payouts)
     function withdraw() external nonReentrant whenNotPaused {
         uint256 amount = pendingWithdrawals[msg.sender];
         require(amount > 0, "Nothing to withdraw");
+        require(address(this).balance >= amount, "Insufficient contract balance");
         pendingWithdrawals[msg.sender] = 0;
         (bool success, ) = payable(msg.sender).call{value: amount}("");
         require(success, "Withdrawal failed");
         emit Withdrawal(msg.sender, amount, 0);
+    }
+
+    /// @notice Accept native CRO deposits to fund contract reserves / liquidity
+    receive() external payable {
+        emit ReservesDeposited(msg.sender, msg.value);
+    }
+
+    fallback() external payable {
+        emit ReservesDeposited(msg.sender, msg.value);
+    }
+
+    /// @notice Explicit reserve deposit function
+    function depositReserves() external payable {
+        require(msg.value > 0, "Zero amount");
+        emit ReservesDeposited(msg.sender, msg.value);
     }
 
     // Process payment to nth upline with 50/50 split and reserve caps
@@ -671,11 +848,11 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         address target = _getNthUpline(payer, level);
 
         if (target != address(0) && users[target].level >= level) {
-            // Every 3rd commission for levels 4-12: 50% to owner, 50% to target
+            // Every 3rd commission for levels 4-12: 2% to owner, 98% to target
             if (level >= 4 && level <= 12) {
                 commissionCount[target]++;
                 if (commissionCount[target] % 3 == 0) {
-                    uint256 ownerPortion = amount / 2;
+                    uint256 ownerPortion = (amount * 2) / 100;
                     uint256 targetPortion = amount - ownerPortion;
 
                     users[owner()].totalEarnings += ownerPortion;
@@ -750,9 +927,15 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         uint256 nextLevel = 0;
         if (user.level < MAX_LEVELS) {
             nextLevel = user.level + 1;
-            reserveCap = cachedNextLevelCost[userAddress];
-            if (reserveCap == 0) {
-                reserveCap = getLevelUpgradeCostCro(nextLevel);
+            uint256 liveCost = _getLevelCostSafe(nextLevel);
+            if (liveCost > 0) {
+                cachedNextLevelCost[userAddress] = liveCost;
+                reserveCap = liveCost;
+            } else {
+                reserveCap = cachedNextLevelCost[userAddress];
+                if (reserveCap == 0) {
+                    reserveCap = getLevelUpgradeCostCro(nextLevel);
+                }
             }
         }
 
@@ -778,7 +961,7 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         }
 
         if (payoutAmount > 0) {
-            pendingWithdrawals[userAddress] += payoutAmount;
+            _sendPayout(userAddress, payoutAmount);
         }
 
         if (user.level < MAX_LEVELS) {
@@ -786,10 +969,22 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         }
     }
 
-    // Find qualified upline for a specific level (max 12 steps up, returns address(0) if none found)
+    // Find qualified upline for a specific level. Reads the pre-saved flat
+    // 12-array linearly for backfilled users (strictly predictable gas);
+    // legacy users fall back to the bounded chain walk until backfilled.
     function _findQualifiedUpline(address user, uint256 level) internal view returns (address) {
-        address currentUpline = matrixParent[user];
+        if (uplinesBackfilled[user]) {
+            for (uint256 i = 0; i < MAX_LEVELS; i++) {
+                address upline = uplineCache[user][i];
+                if (upline == address(0)) break;
+                if (users[upline].level >= level) {
+                    return upline;
+                }
+            }
+            return address(0);
+        }
 
+        address currentUpline = matrixParent[user];
         for (uint256 i = 0; i < MAX_LEVELS && currentUpline != address(0); i++) {
             if (users[currentUpline].level >= level) {
                 return currentUpline;
@@ -800,8 +995,11 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         return address(0);
     }
 
-    // Get the nth upline of a user (follows matrixParent chain)
+    // Get the nth upline of a user. Prefers the pre-saved flat 12-array
+    // (O(1) read); legacy users use the bounded walk until backfilled.
     function _getNthUpline(address user, uint256 n) internal view returns (address) {
+        if (uplinesBackfilled[user]) return uplineCache[user][n - 1];
+
         address current = matrixParent[user];
         for (uint256 i = 1; i < n && current != address(0); i++) {
             current = matrixParent[current];
@@ -841,49 +1039,6 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     // ===== MATRIX DOWNLINE QUERIES (reads stored children, no on-chain search) =====
 
     uint256 private constant MAX_DOWNLINE_BATCH = 2000;
-
-    /// @notice Get downline by traversing stored matrixChildren arrays
-    function getDownline(address userAddress, uint256 depth) external view returns (address[] memory) {
-        require(users[userAddress].id != address(0), "Not reg");
-        require(depth > 0 && depth <= 20, "Depth 1-20");
-
-        address[] memory buffer = new address[](MAX_DOWNLINE_BATCH);
-        address[] memory queue = new address[](MAX_DOWNLINE_BATCH);
-        uint256 found = 0;
-        uint256 qStart = 0;
-        uint256 qEnd = 0;
-
-        address[] storage children = matrixChildren[userAddress];
-        for (uint256 i = 0; i < children.length && qEnd < MAX_DOWNLINE_BATCH; i++) {
-            queue[qEnd++] = children[i];
-        }
-
-        uint256 currentDepth = 1;
-        uint256 remaining = qEnd - qStart;
-
-        while (qStart < qEnd && found < MAX_DOWNLINE_BATCH && currentDepth <= depth) {
-            if (remaining == 0) {
-                currentDepth++;
-                remaining = qEnd - qStart;
-                if (currentDepth > depth) break;
-            }
-
-            address current = queue[qStart++];
-            remaining--;
-            buffer[found++] = current;
-
-            address[] storage childList = matrixChildren[current];
-            for (uint256 i = 0; i < childList.length && qEnd < MAX_DOWNLINE_BATCH; i++) {
-                queue[qEnd++] = childList[i];
-            }
-        }
-
-        address[] memory result = new address[](found);
-        for (uint256 i = 0; i < found; i++) {
-            result[i] = buffer[i];
-        }
-        return result;
-    }
 
     /// @notice Get paginated downline from stored matrix children (single-pass)
     function getDownlinePaginated(address userAddress, uint256 depth, uint256 offset, uint256 count)
@@ -935,39 +1090,6 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         }
     }
 
-    /// @notice Get downline up to 62 members (gas-efficient for 200k user scale)
-    function getDownlineUpTo62(address userAddress) external view returns (address[] memory) {
-        require(users[userAddress].id != address(0), "Not reg");
-
-        address[] memory result = new address[](62);
-        address[] memory queue = new address[](128);
-        uint256 found = 0;
-        uint256 qStart = 0;
-        uint256 qEnd = 0;
-
-        address[] storage children = matrixChildren[userAddress];
-        for (uint256 i = 0; i < children.length && qEnd < 128; i++) {
-            queue[qEnd++] = children[i];
-        }
-
-        while (qStart < qEnd && found < 62) {
-            address current = queue[qStart++];
-            result[found++] = current;
-
-            address[] storage childList = matrixChildren[current];
-            for (uint256 i = 0; i < childList.length && qEnd < 128; i++) {
-                queue[qEnd++] = childList[i];
-            }
-        }
-
-        // Trim to actual found count
-        address[] memory trimmed = new address[](found);
-        for (uint256 i = 0; i < found; i++) {
-            trimmed[i] = result[i];
-        }
-        return trimmed;
-    }
-
     /// @notice Get parent (referrer) info for a user
     function getUserParentInfo(address userAddress) external view returns (address referrer, uint256 referrerLevel) {
         require(users[userAddress].id != address(0), "Not reg");
@@ -980,34 +1102,82 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         return matrixChildren[userAddress];
     }
 
-    /// @notice Find next available slot using subtreeSlots (O(depth), no BFS)
+    /// @notice Find next available slot using balanced subtree placement (O(depth))
     function findNextSlot(address root) external view returns (address) {
         require(users[root].id != address(0), "Not reg");
+        return _findNextSlotInternal(root);
+    }
 
+    /// @notice Internal slot search shared by the view and on-chain auto-registration
+    ///         (no off-chain tree walk needed).
+    function _findNextSlotInternal(address root) internal view returns (address) {
         address current = root;
-        while (true) {
+        uint256 depth = 0;
+        while (depth < 200) {
+            depth++;
             address[] storage kids = matrixChildren[current];
             if (kids.length < MAX_REFERRALS) return current;
 
-            // Both children exist — go to the child that still has room
-            if (subtreeSlots[kids[0]] > 0) {
+            // Both children exist — check if any direct child has open slots first
+            if (matrixChildren[kids[0]].length < MAX_REFERRALS) {
                 current = kids[0];
-            } else if (kids.length > 1 && subtreeSlots[kids[1]] > 0) {
+            } else if (kids.length > 1 && matrixChildren[kids[1]].length < MAX_REFERRALS) {
+                current = kids[1];
+            } else if (kids.length > 1 && totalDownline[kids[0]] <= totalDownline[kids[1]]) {
+                current = kids[0];
+            } else if (kids.length > 1) {
                 current = kids[1];
             } else {
-                return address(0); // tree full (shouldn't happen if subtreeSlots[root] > 0)
+                current = kids[0];
             }
         }
+        return address(0);
     }
 
-    struct UserDashboard {
-        uint256 level;
-        uint256 directReferrals;
-        uint256 totalReferrals;
-        uint256 totalEarnings;
-        uint256 totalWithdrawableBalance;
-        uint256 totalReservedBalance;
-        uint256 lastActiveTime;
+    /// @notice Build the matrix path placementParent -> ... -> referrer on-chain.
+    ///         Replaces the former off-chain loop that walked `matrixParent` with
+    ///         up to 100 sequential RPC calls — now a single view call.
+    function _buildPlacementPath(address placementParent, address referrer)
+        internal
+        view
+        returns (address[] memory)
+    {
+        if (placementParent == referrer) {
+            address[] memory single = new address[](1);
+            single[0] = placementParent;
+            return single;
+        }
+        address[] memory tmp = new address[](101);
+        uint256 len = 0;
+        address current = placementParent;
+        for (uint256 i = 0; i < 100; i++) {
+            tmp[len++] = current;
+            current = matrixParent[current];
+            if (current == address(0)) break;
+            if (current == referrer) {
+                tmp[len++] = current;
+                break;
+            }
+        }
+        require(len > 0 && tmp[len - 1] == referrer, "Not in tree");
+        address[] memory path = new address[](len);
+        for (uint256 i = 0; i < len; i++) {
+            path[i] = tmp[i];
+        }
+        return path;
+    }
+
+    /// @notice Find the balanced slot AND its path proof in ONE RPC
+    ///         (replaces findNextSlot + up-to-100 matrixParent reads).
+    function findNextSlotAndProof(address root)
+        external
+        view
+        returns (address slot, address[] memory path)
+    {
+        require(users[root].id != address(0), "Not reg");
+        slot = _findNextSlotInternal(root);
+        require(slot != address(0), "Tree full");
+        path = _buildPlacementPath(slot, root);
     }
 
     struct SystemInfo {
@@ -1015,21 +1185,6 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         uint256[12] levelCostsCro;
         uint256 croUsdPrice;
         uint256 totalUsers;
-    }
-
-    /// @notice Aggregate user dashboard data — replaces 5 separate RPC calls
-    function getUserDashboard(address userAddress) external view returns (UserDashboard memory) {
-        User storage user = users[userAddress];
-        require(user.id != address(0), "Not reg");
-        return UserDashboard({
-            level: user.level,
-            directReferrals: user.directReferrals,
-            totalReferrals: user.totalReferrals,
-            totalEarnings: user.totalEarnings,
-            totalWithdrawableBalance: getTotalWithdrawableBalance(userAddress),
-            totalReservedBalance: getTotalReservedBalance(userAddress),
-            lastActiveTime: user.lastActiveTime
-        });
     }
 
     /// @notice Aggregate system-wide info — replaces 4 separate RPC calls
@@ -1109,28 +1264,6 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
         }
     }
 
-    /// @notice Get multiple user financial infos in one RPC call
-    function getUserFinancialInfosBatch(address[] calldata addresses) external view returns (
-        uint256[13][] memory levelEarningsArr,
-        uint256[13][] memory reservedArr,
-        uint256[] memory totalReservedArr
-    ) {
-        uint256 len = addresses.length;
-        require(len > 0 && len <= 20, "Batch 1-20");
-
-        levelEarningsArr = new uint256[13][](len);
-        reservedArr = new uint256[13][](len);
-        totalReservedArr = new uint256[](len);
-
-        for (uint256 i = 0; i < len; i++) {
-            if (users[addresses[i]].id != address(0)) {
-                levelEarningsArr[i] = _getLevelEarnings(addresses[i]);
-                reservedArr[i] = _getReservedForUpgrade(addresses[i]);
-                totalReservedArr[i] = getTotalReservedBalance(addresses[i]);
-            }
-        }
-    }
-
     /// @notice Paginated user address list (for frontend pagination)
     function getUserAddressesPaginated(uint256 startIndex, uint256 count) external view returns (address[] memory) {
         uint256 len = userAddresses.length;
@@ -1149,5 +1282,57 @@ contract ParadiseUpgradeable is Initializable, OwnableUpgradeable, ReentrancyGua
     /// @dev Reserved storage slots for future upgrades
     uint256 private autoUpgradeDepth;
 
-    uint256[33] private __gap;
+    // Exact, always-up-to-date downline count per user.
+    // On every registration this is incremented for ALL ancestors of the new member
+    // (walking matrixParent), so a user's count reflects their full subtree. O(1) to read,
+    // scales to millions of members without on-chain traversal.
+    mapping(address => uint256) public totalDownline;
+
+    /// @dev True once a user's totalDownline was backfilled from the existing tree (migration only).
+    mapping(address => bool) public downlineBackfilled;
+
+    /// @dev True once a user's lost reserve was credited back by the owner via
+    ///      creditMigratedReserves() (one-time settlement of the first migration).
+    mapping(address => bool) public settlementCredited;
+
+    // ===== SAFE-PUSH PAYOUT STORAGE (rigid splayed layout, predictable gas) =====
+    /// @dev Pre-computed 12-upline chain per user, frozen at registration.
+    ///      matrixParent links are immutable, so this flat array never goes stale.
+    ///      Payout resolution reads this array linearly — no live tree search.
+    mapping(address => address[12]) public uplineCache;
+    /// @dev True once uplineCache[user] has been populated (at registration or
+    ///      via backfillUplinesBatch / migrateUserBatch for pre-upgrade users).
+    mapping(address => bool) public uplinesBackfilled;
+    /// @dev Push-to-fail escape hatch: every automatic payout uses a low-level
+    ///      .call; if it returns false the loop does NOT revert — the amount is
+    ///      routed here and stays pullable via claimMissedEarnings().
+    mapping(address => uint256) public emergencyBalances;
+
+    /// @notice One-time settlement for the first migration: credits each user's
+    ///         next-level reserve (`reservedForUpgrade[level+1]`) with the amount
+    ///         they lost when reserve balances were not carried over. Idempotent —
+    ///         users already credited are skipped, so batches can be safely re-run.
+    /// @param userList  Array of migrated user addresses
+    /// @param amountList  Per-user credit in wei, credited to reservedForUpgrade[level+1]
+    function creditMigratedReserves(address[] calldata userList, uint256[] calldata amountList) external onlyOwner {
+        require(userList.length == amountList.length, "Length mismatch");
+        require(userList.length > 0 && userList.length <= 50, "Batch 1-50");
+
+        for (uint256 i = 0; i < userList.length; i++) {
+            address userAddr = userList[i];
+            if (settlementCredited[userAddr]) continue;
+
+            User storage user = users[userAddr];
+            require(user.id != address(0), "Not reg");
+            require(user.level < MAX_LEVELS, "Max level");
+
+            uint256 targetLevel = user.level + 1;
+            user.reservedForUpgrade[targetLevel] += amountList[i];
+            settlementCredited[userAddr] = true;
+
+            emit ReserveCredited(userAddr, targetLevel, amountList[i]);
+        }
+    }
+
+    uint256[27] private __gap;
 }

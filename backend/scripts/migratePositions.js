@@ -12,8 +12,8 @@ async function main() {
   const totalUsers = await c.getTotalUsers();
   console.log("Total users:", Number(totalUsers));
 
-  const downline = await c.getDownline(deployer.address, 5);
-  console.log("Downline (BFS, depth 5):", downline.length, "members");
+  const downline = await c.getDownlinePaginated(deployer.address, 5, 0, 0);
+  console.log("Downline (BFS, depth 5):", downline.total.toString(), "members");
 
   const parentInfo = await c.getUserParentInfo(deployer.address);
   console.log("Parent info -> referrer:", parentInfo.referrer, "level:", Number(parentInfo.referrerLevel));
